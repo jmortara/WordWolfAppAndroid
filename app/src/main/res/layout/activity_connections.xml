@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				xmlns:tools="http://schemas.android.com/tools"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:paddingLeft="@dimen/activity_horizontal_margin"
+				android:paddingRight="@dimen/activity_horizontal_margin"
+				android:paddingTop="@dimen/activity_vertical_margin"
+				android:paddingBottom="@dimen/activity_vertical_margin"
+				tools:context="com.mortaramultimedia.wordwolfappandroid.activities.ConnectionsActivity">
+
+<LinearLayout
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:weightSum="1">
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="60dp">
+
+		<CheckBox
+			android:id="@+id/connectedToServerCheckBox"
+			android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:clickable="false"
+			/>
+
+		<TextView
+			android:id="@+id/serverText"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Server"
+			/>
+
+		<CheckBox
+			android:id="@+id/connectedToDatabaseCheckBox"
+			android:layout_marginLeft="20dp"
+			android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:clickable="false"
+			/>
+
+		<TextView
+			android:id="@+id/dbText"
+			android:text="DB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			/>
+
+		<CheckBox
+			android:id="@+id/loggedInCheckBox"
+			android:layout_marginLeft="20dp"
+			android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:clickable="false"
+			/>
+
+		<TextView
+			android:id="@+id/loginText"
+			android:text="Logged In"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="30dp">
+		<TextView
+			android:id="@+id/user"
+			android:text="User:"
+			android:editable="false"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			/>
+
+		<TextView
+			android:id="@+id/usernameText"
+			android:text="(username)"
+			android:editable="false"
+			android:layout_width="130dp"
+			android:layout_height="wrap_content"
+			/>
+		<TextView
+			android:id="@+id/opponent"
+			android:text="Opponent:"
+			android:editable="false"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			/>
+
+		<TextView
+			android:id="@+id/opponentUsernameText"
+			android:text="(username)"
+			android:editable="false"
+			android:layout_width="130dp"
+			android:layout_height="wrap_content"
+			/>
+	</LinearLayout>
+
+	<Button
+		android:id="@+id/loginButton"
+		android:text="Log In"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:onClick="handleLoginButtonClick"
+		/>
+
+	<Space
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="0.19"
+		/>
+
+
+	<Button
+		android:id="@+id/chooseOpponentButton"
+		android:text="@string/choose_opponent"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:onClick="handleChooseOpponentButtonClick"
+		/>
+
+	<Space
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="0.6"
+		/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:text="@string/input_text_hint"
+		/>
+
+	<EditText
+		android:id="@+id/inputText"
+		android:text="@string/click_to_enter_text"
+		android:editable="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:minHeight="50dp"
+		android:onClick="handleInputTextClick"
+		/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal">
+
+		<Button
+			android:id="@+id/hideKeyboardButton"
+			android:text="Done"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="handleHideSoftKeyboardButtonClick"
+			/>
+
+		<Button
+			android:id="@+id/clearInputButton"
+			android:text="Clear"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="handleClearInputTextButtonClick"
+			/>
+	</LinearLayout>
+
+</LinearLayout>
+
+</RelativeLayout>

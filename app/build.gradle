@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '21.0.1'
     defaultConfig {
         applicationId "com.mortaramultimedia.wordwolfappandroid"
         minSdkVersion 16
@@ -25,4 +25,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
+    compile files('libs/wordwolf_shared_objects.jar')
+    compile files('libs/mysql_connector_java_5.1.34_bin.jar')
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }

@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.mortaramultimedia.wordwolfappandroid.Model;
+import com.mortaramultimedia.wordwolfappandroid.R;
+import com.mortaramultimedia.wordwolfappandroid.SettingsActivity;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +28,7 @@ import java.util.HashMap;
  */
 public class MainActivity extends Activity {
 
-	public static final String TAG = "WelcomeActivity";
+	public static final String TAG = "MainActivity";
 	private TextView statusText;
 	private Button startButton;
 
@@ -43,15 +47,15 @@ public class MainActivity extends Activity {
 		statusText = (TextView) findViewById(R.id.statusText);
 		startButton = (Button) findViewById(R.id.startButton);
 
-		statusText.setText( getResources().getString(R.string.startup));
-		setStartButtonVisibility(View.INVISIBLE);
-		populateDictionary();
+		statusText.setText(getResources().getString(R.string.startup));
+//		setStartButtonVisibility(View.INVISIBLE);
+//		populateDictionary();	//TODO - move to game
 
 	}
 
 	private void setStartButtonVisibility( int v )
 	{
-		startButton.setVisibility( v );
+		startButton.setVisibility(v);
 	}
 
 	private void populateDictionary()
@@ -75,6 +79,7 @@ public class MainActivity extends Activity {
 
 	}
 
+	//TODO: move to game
 	public static HashMap<String, String> loadDictionary(Context context)
 	{
 		Log.d(TAG, "loadDictionary");
@@ -107,11 +112,19 @@ public class MainActivity extends Activity {
 		return myDict;
 	}
 
+	public void handleDebugButtonClick(View view)
+	{
+		Log.d(TAG, "handleDebugButtonClick");
+
+		Intent settingsIntent = new Intent(this, ServerActivity.class);
+		startActivity(settingsIntent);
+	}
+
 	public void handleStartButtonClick(View view)
 	{
 		Log.d(TAG, "handleStartButtonClick");
 
-		Intent settingsIntent = new Intent(this, SettingsActivity.class);
+		Intent settingsIntent = new Intent(this, ConnectionsActivity.class);
 		startActivity(settingsIntent);
 	}
 

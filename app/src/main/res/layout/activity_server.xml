@@ -1,0 +1,327 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".ServerActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp">
+
+            <CheckBox
+                android:id="@+id/connectedToServerCheckBox"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:clickable="false"
+                />
+
+            <Button
+                android:id="@+id/connectToServerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Server\nConnect"
+                android:onClick="handleConnectToServerButtonClick"
+                />
+
+            <CheckBox
+                android:id="@+id/connectedToDatabaseCheckBox"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:clickable="false"
+                />
+
+            <Button
+                android:id="@+id/connectToDatabaseButton"
+                android:text="Connect\nto DB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleConnectToDatabaseButtonClick"
+                />
+
+            <CheckBox
+                android:id="@+id/loggedInCheckBox"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:clickable="false"
+                />
+
+            <Button
+                android:id="@+id/loginButton"
+                android:text="Log\nin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleLoginButtonClick"
+                />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                >
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp">
+        <TextView
+                android:id="@+id/user"
+                android:text="User:"
+                android:editable="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:id="@+id/usernameText"
+                android:text="(username)"
+                android:editable="false"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                />
+        <TextView
+                android:id="@+id/opponent"
+                android:text="Opponent:"
+                android:editable="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:id="@+id/opponentUsernameText"
+                android:text="(username)"
+                android:editable="false"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.19"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Input text for behavior below."
+            />
+
+        <EditText
+            android:id="@+id/inputText"
+            android:text="Click to enter text."
+            android:editable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:onClick="handleInputTextClick"
+            />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/hideKeyboardButton"
+            android:text="Done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="handleHideSoftKeyboardButtonClick"
+            />
+
+        <Button
+            android:id="@+id/clearInputButton"
+            android:text="Clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="handleClearInputTextButtonClick"
+            />
+    </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.19"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Choose Message Type Below"
+            />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/sendMessageButton"
+                android:text="Send\nMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleSendMessageButtonClick"
+                />
+
+            <Button
+                android:id="@+id/echoMessageButton"
+                android:text="Echo\nMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleEchoMessageButtonClick"
+                />
+
+            <Button
+                android:id="@+id/getAllPlayersButton"
+                android:text="Get\nAllPlyrs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleGetAllPlayersButtonClick"
+                />
+
+            <Button
+                android:id="@+id/getOpponentsButton"
+                android:text="Get\nOppnts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleGetOpponentsButtonClick"
+                />
+
+            <!--Button
+				 android:id="@+id/setUsernameButton"
+				 android:text="Set\nUsrnm"
+				 android:layout_width="wrap_content"
+				 android:layout_height="wrap_content"
+				 android:onClick="handleSetUsernameButtonClick"
+				 />
+
+			  <Button
+				 android:id="@+id/getUsernameButton"
+				 android:text="Get\nUsrnm"
+				 android:layout_width="wrap_content"
+				 android:layout_height="wrap_content"
+				 android:onClick="handleGetUsernameButtonClick"
+				 /-->
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/selectOpponentButton"
+                android:text="Select\nOppnt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleSelectOpponentButtonClick"
+                />
+
+            <Button
+                android:id="@+id/acceptOpponentButton"
+                android:text="Accept\nOppnt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleAcceptOpponentButtonClick"
+                />
+
+            <Button
+                android:id="@+id/messageOpponentButton"
+                android:text="Msg\nOppnt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleMessageOpponentButtonClick"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/startGameButton"
+                android:text="Start\nGame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleStartGameButtonClick"/>
+
+            <Button
+                android:id="@+id/sendMoveButton"
+                android:text="Send\nMove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleSendMoveButtonClick"/>
+
+            <Button
+                android:id="@+id/sendScoreButton"
+                android:text="Send\nScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleSendScoreButtonClick"/>
+
+            <Button
+                android:id="@+id/endGameButton"
+                android:text="End\nGame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleEndGameButtonClick"/>
+
+            <!--Button
+                android:id="@+id/testButton"
+                android:text="Login\nTest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="handleLoginTestButtonClick"/-->
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.24" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Incoming Message"
+            />
+
+        <TextView
+            android:id="@+id/incomingText"
+            android:text="Incoming message from server"
+            android:editable="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>
