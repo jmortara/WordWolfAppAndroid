@@ -16,12 +16,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mortaramultimedia.wordwolf.shared.messages.ConnectToDatabaseResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.GetPlayerListRequest;
-import com.mortaramultimedia.wordwolf.shared.messages.GetPlayerListResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.LoginResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentRequest;
-import com.mortaramultimedia.wordwolf.shared.messages.SimpleMessage;
+import com.mortaramultimedia.wordwolf.shared.constants.*;
+import com.mortaramultimedia.wordwolf.shared.messages.*;
+
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
@@ -106,7 +103,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	{
 		Log.d(TAG, "requestPlayerList");
 
-		GetPlayerListRequest request = new GetPlayerListRequest(GetPlayerListRequest.REQUEST_TYPE_ALL_PLAYERS);
+		GetPlayerListRequest request = new GetPlayerListRequest(PlayerListType.ALL_UNMATCHED_PLAYERS);
 		try
 		{
 			Comm.out().writeObject(request);

@@ -347,7 +347,7 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "handleGetAllPlayersButtonClick");
 		hideSoftKeyboard();
-		GetPlayerListRequest getPlayerListRequest = new GetPlayerListRequest(GetPlayerListRequest.REQUEST_TYPE_ALL_PLAYERS);
+		GetPlayerListRequest getPlayerListRequest = new GetPlayerListRequest(PlayerListType.ALL_UNMATCHED_PLAYERS);
 		serverTask.sendOutgoingObject(getPlayerListRequest);
 	}
 
