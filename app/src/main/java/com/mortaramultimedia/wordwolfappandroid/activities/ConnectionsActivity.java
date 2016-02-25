@@ -1,7 +1,9 @@
 package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,8 +13,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.mortaramultimedia.wordwolf.shared.constants.Constants;
 import com.mortaramultimedia.wordwolf.shared.messages.ConnectToDatabaseResponse;
 import com.mortaramultimedia.wordwolf.shared.messages.LoginResponse;
+import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentRequest;
+import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentResponse;
 import com.mortaramultimedia.wordwolf.shared.messages.SimpleMessage;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
@@ -238,10 +243,17 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 
 		updateUI();
 
-		//TODO - we are assuming the first object from the server is a SimpleMessage. Change it to a new type e.g. ServerConnectionResponse.
 		if (obj instanceof SimpleMessage)
 		{
-			Comm.connectToDB();
+			// if it's a handshake String, connect to the DB
+			if(((SimpleMessage) obj).getMsg().equals(Constants.HELLO_CLIENT))	//TODO - Change to a new type e.g. ServerConnectionResponse.
+			{
+				Comm.connectToDB();
+			}
+			else
+			{
+				Log.d(TAG, "handleIncomingObject: SimpleMessage: " + ((SimpleMessage)obj).getMsg());
+			}
 		}
 		else if (obj instanceof ConnectToDatabaseResponse)
 		{
@@ -257,9 +269,76 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 				chooseOpponentButton.setVisibility(View.VISIBLE);
 			}
 		}
+		else if (obj instanceof SelectOpponentRequest)
+		{
+			if (((SelectOpponentRequest) obj).getDestinationUserName().equals(Model.getUserLogin().getUserName()))
+			{
+				showSelectOpponentRequestDialog((SelectOpponentRequest) obj);
+			}
+		}
+		else if (obj instanceof SelectOpponentResponse)
+		{
+			handleSelectOpponentResponse(((SelectOpponentResponse) obj));
+		}
 		else
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
 		}
 	}
+
+	private void showSelectOpponentRequestDialog(SelectOpponentRequest request)
+	{
+		Log.d(TAG, "showSelectOpponentRequestDialog");
+
+		final String sourceUsername = request.getSourceUsername();
+		AlertDialog dialog = new AlertDialog.Builder(this).create();
+		dialog.setTitle("Opponent Request");
+		dialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
+
+		// set up and listener for Accept button
+		dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
+//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
+//				String sourceUsername = request.getSourceUsername();
+				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername);
+				Comm.sendObject(response);
+			}
+		});
+
+		// set up and listener for Decline button
+		dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
+//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
+//				String sourceUsername = request.getSourceUsername();
+				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername);
+				Comm.sendObject(response);
+			}
+		});
+
+		dialog.show();
+	}
+
+	private void handleSelectOpponentResponse(SelectOpponentResponse response)
+	{
+		Log.d(TAG, "handleSelectOpponentResponse: " + response);
+//		publishObject(response);
+		if (response.getRequestAccepted())
+		{
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
+			Model.setOpponentUsername(response.getSourceUserName());
+		}
+		else
+		{
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+		}
+	}
+
 }

@@ -152,6 +152,19 @@ public class Comm
 		{
 			currentActivity.handleIncomingObject(obj);
 		}
+	}
 
+	public static void sendObject(Object obj)
+	{
+		Log.d(TAG, "sendObject: " + obj);
+		try
+		{
+			outStream.writeObject(obj);
+			outStream.flush();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

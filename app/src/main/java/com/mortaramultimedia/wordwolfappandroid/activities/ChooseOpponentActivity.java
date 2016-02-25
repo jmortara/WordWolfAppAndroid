@@ -73,16 +73,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 				final String opponentName = (String) parent.getItemAtPosition(position);
 				Log.d(TAG, "handleIncomingObject: opponent list item clicked: " + opponentName);
 				SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentName);
-				try
-				{
-					Comm.out().writeObject(request);
-					Comm.out().flush();
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-
+				Comm.sendObject(request);
 			}
 		});
 	}
@@ -104,15 +95,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		Log.d(TAG, "requestPlayerList");
 
 		GetPlayerListRequest request = new GetPlayerListRequest(PlayerListType.ALL_UNMATCHED_PLAYERS);
-		try
-		{
-			Comm.out().writeObject(request);
-			Comm.out().flush();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		Comm.sendObject(request);
 	}
 
 	/**
@@ -133,7 +116,11 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 
 		updateUI();
 
-		if (obj instanceof GetPlayerListResponse)
+		if(obj instanceof SimpleMessage)
+		{
+			Log.d(TAG, "handleIncomingObject: SimpleMessage: " + ((SimpleMessage)obj).getMsg());
+		}
+		else if (obj instanceof GetPlayerListResponse)
 		{
 			ArrayList<String> players = (((GetPlayerListResponse) obj).getPlayersCopy());
 			if(players != null && players.size() > 0)
@@ -143,9 +130,29 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 				opponentsListView.setAdapter(playersAdapter);
 			}
 		}
+		else if (obj instanceof SelectOpponentResponse)
+		{
+			handleSelectOpponentResponse(((SelectOpponentResponse) obj));
+		}
 		else
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
+		}
+	}
+
+	private void handleSelectOpponentResponse(SelectOpponentResponse response)
+	{
+		Log.d(TAG, "handleSelectOpponentResponse: " + response);
+//		publishObject(response);
+		if (response.getRequestAccepted())
+		{
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
+//			Model.setOpponentUsername(response.getSourceUserName());	// already handled by ServerTask
+			//TODO: players are now matched on server. begin game sequence on client. **************************************
+		}
+		else
+		{
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
 		}
 	}
 }
