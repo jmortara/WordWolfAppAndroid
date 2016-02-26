@@ -242,7 +242,7 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 		/**
 		 * If receiving a ConnectToDatabaseResponse, if it is a successful one, that means we can then attempt a login or create account.
 		 */
-		if (obj instanceof ConnectToDatabaseResponse)
+		else if (obj instanceof ConnectToDatabaseResponse)
 		{
 			handleConnectToDatabaseResponse(((ConnectToDatabaseResponse) obj));
 		}
@@ -254,21 +254,21 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 			handleLoginResponse(((LoginResponse) obj));
 		}
 		/**
-		 * If receiving a GetPlayerListResponse
+		 * If receiving a GetPlayerListResponse, its player list will be used by ChooseOpponentActivity
 		 */
 		else if (obj instanceof GetPlayerListResponse)
 		{
 			handleGetPlayerListResponse(((GetPlayerListResponse) obj));
 		}
 		/**
-		 * If receiving a SelectOpponentRequest, which is a request from another player to become opponents.
+		 * If receiving a SelectOpponentRequest, which is a request from another player to become opponents, show a dialog asking to Accept or Decline the invitation.
 		 */
 		else if (obj instanceof SelectOpponentRequest)
 		{
 			handleRequestToBecomeOpponent(((SelectOpponentRequest) obj));
 		}
 		/**
-		 * If receiving a SelectOpponentResponse, which is a response to a request to become another player's opponent.
+		 * If receiving a SelectOpponentResponse, which is a response to a request to become this player's opponent. Will contain accepted/declined param.
 		 */
 		else if (obj instanceof SelectOpponentResponse)
 		{
@@ -405,7 +405,7 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 	{
 		Log.d(TAG, "handleCreateGameResponse: " + response);
 		GameBoard gameBoard = response.getGameBoard();
-		publishObject(gameBoard);
+		publishObject(response);	// publishing the gameBoard for the debug activity is interfering with the normal object forwarding flow
 		logGameBoard(gameBoard);
 		Model.setGameBoard(gameBoard);
 		Model.setGameDurationMS(response.getGameDurationMS());

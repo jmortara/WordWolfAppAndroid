@@ -196,13 +196,21 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "handleChooseOpponentButtonClick");
 
+		launchChooseOpponentActivity();
+	}
+
+	/**
+	 * Launch the Choose Opponent Activity
+	 */
+	private void launchChooseOpponentActivity()
+	{
 		// create an Intent for launching the Choose Opponent Activity, with optional additional params
 		Context thisContext = ConnectionsActivity.this;
 		Intent intent = new Intent(thisContext, ChooseOpponentActivity.class);
 		intent.putExtra("testParam", "testValue");                        //optional params
 
-		// start the activity
-		startActivityForResult(intent, 1);      //TODO: note that in order for this class' onActivityResult to be called when the LoginActivity has completed, the requestCode here must be > 0
+//		startActivityForResult(intent, 1);
+		startActivity(intent);	// maybe we don't need to return to this activity with a result... just move forward from there.
 	}
 
 	/**
@@ -329,6 +337,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	private void handleSelectOpponentResponse(SelectOpponentResponse response)
 	{
 		Log.d(TAG, "handleSelectOpponentResponse: " + response);
+
 //		publishObject(response);
 		if (response.getRequestAccepted())
 		{

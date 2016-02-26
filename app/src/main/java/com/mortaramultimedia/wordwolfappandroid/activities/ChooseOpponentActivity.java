@@ -71,13 +71,12 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				final String opponentName = (String) parent.getItemAtPosition(position);
-				Log.d(TAG, "handleIncomingObject: opponent list item clicked: " + opponentName);
+				Log.d(TAG, "Opponent List Item Click Listener: opponent list item clicked: " + opponentName);
 				SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentName);
 				Comm.sendObject(request);
 			}
 		});
 	}
-
 
 	/**
 	 * Update this activity's UI.
@@ -143,16 +142,32 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	private void handleSelectOpponentResponse(SelectOpponentResponse response)
 	{
 		Log.d(TAG, "handleSelectOpponentResponse: " + response);
+
 //		publishObject(response);
 		if (response.getRequestAccepted())
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
-//			Model.setOpponentUsername(response.getSourceUserName());	// already handled by ServerTask
-			//TODO: players are now matched on server. begin game sequence on client. **************************************
+			launchGameSetupActivity();
 		}
 		else
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
 		}
+	}
+
+	/**
+	 * Launch the Game Setup Activity
+	 */
+	private void launchGameSetupActivity()
+	{
+		Log.d(TAG, "launchGameSetupActivity");
+
+		// create an Intent for launching the Game Setup Activity, with optional additional params
+		Context thisContext = ChooseOpponentActivity.this;
+		Intent intent = new Intent(thisContext, GameSetupActivity.class);
+		intent.putExtra("testParam", "testValue");                        //optional params
+
+		// start the activity
+		startActivity(intent);
 	}
 }

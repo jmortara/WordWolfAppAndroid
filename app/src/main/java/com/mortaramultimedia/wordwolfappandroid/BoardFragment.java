@@ -18,6 +18,10 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
+import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
+import com.mortaramultimedia.wordwolf.shared.messages.TileData;
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
+
 /**
  * A simple {@link android.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -38,9 +42,12 @@ public class BoardFragment extends Fragment {
 	private String mParam1;
 	private String mParam2;
 
+	GameBoard gameBoardData;
 	GridLayout gl;
 	ArrayList<Button> buttons;
 	int item;
+	int rows;
+	int cols;
 	BoardActivity boardActivity;
 
 	private OnFragmentInteractionListener mListener;
@@ -74,7 +81,17 @@ public class BoardFragment extends Fragment {
 			mParam2 = getArguments().getString(ARG_PARAM2);
 		}
 
+		createReferences();
 		setupBoardLayout();
+	}
+
+	private void createReferences()
+	{
+		Log.d(TAG, "createReferences");
+
+		this.gameBoardData = Model.getGameBoard();
+		this.rows = gameBoardData.getRows();
+		this.cols = gameBoardData.getRows();
 	}
 
 	private void setupBoardLayout()
@@ -90,15 +107,15 @@ public class BoardFragment extends Fragment {
 
 		boardActivity = (BoardActivity) getActivity();
 
-		createLettersArray();
-		createBoardData();
+//		createLettersArray();
+//		createBoardData();
 		printBoardData();
 		GameManager.init();
 
 		gl = new GridLayout( getActivity() );
 		gl.setLayoutParams( new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT) );
-		gl.setColumnCount( Model.cols );
-		gl.setRowCount( Model.rows );
+		gl.setColumnCount( this.cols );
+		gl.setRowCount( this.rows );
 		gl.setBackgroundColor(0xDEE1F7);
 
 
@@ -111,28 +128,29 @@ public class BoardFragment extends Fragment {
 
 //        int viewWidth    = gl.getWidth();
 //        int viewHeight   = gl.getHeight();
-		int buttonWidth  = 260 / ( Model.cols + 1 );
-		int buttonHeight = 260 / ( Model.rows + 1 );
+		int buttonWidth  = 260 / ( this.cols + 1 );
+		int buttonHeight = 260 / ( this.rows + 1 );
 
 //        Log.d(TAG, "onCreateView: view width: " + viewWidth);
 //        Log.d(TAG, "onCreateView: view viewHeight: " + viewHeight);
 //        Log.d(TAG, "onCreateView: view buttonWidth: " + buttonWidth);
 //        Log.d(TAG, "onCreateView: view buttonHeight: " + buttonHeight);
 
-		for(int row=0; row<Model.rows; row++)
+		for(int row=0; row<this.rows; row++)
 		{
 			//rowLayout = new LinearLayout( getActivity() );
-			for (int col=0; col<Model.cols; col++)
+			for (int col=0; col<this.cols; col++)
 			{
-				c = Model.boardData[ col ][ row ];  // get from data
+				c = Model.getGameBoard().getLetterAtPos(row, col); // get from data
 
-				if ( Model.DEBUG_MODE )
+				// optionally add some debug info onscreen
+				if ( Model.DEV_DEBUG_MODE )
 				{
 					debugStr = "\n" + " c" + col + " r" + row;
 				}
 
 				newButton = new Button( getActivity() );
-				PositionObj tagObj = new PositionObj( col, row );
+				TileData tagObj = new TileData( col, row, c, false );
 
 				newButton.setTag( tagObj );
 				newButton.setLayoutParams( new LinearLayout.LayoutParams( buttonWidth, buttonHeight ) );
@@ -154,7 +172,25 @@ public class BoardFragment extends Fragment {
 
 	}
 
-	private void createBoardData()
+	/*private void createBoardData()
+	{
+		Character c = 'Z';
+
+		for(int row=0; row<this.rows; row++)
+		{
+			for (int col = 0; col < this.cols; col++)
+			{
+				c = getRandomLetter();
+				Log.d(TAG, "createBoardData: col " + col + " row " + row + ": " + c);
+				Model.boardData[col][row] = c;
+			}
+		}
+	}*/
+
+	/**
+	 * DEPRECATED VERSION
+	 */
+/*	private void createBoardData()
 	{
 		Character c = 'z';
 		Model.boardData = new Character[ Model.cols ][ Model.rows ];
@@ -168,28 +204,28 @@ public class BoardFragment extends Fragment {
 				Model.boardData[col][row] = c;
 			}
 		}
-	}
+	}*/
 
 	private void printBoardData()
 	{
 		Character c = 'w';
 
-		for (int row=0; row<Model.rows; row++)
+		for (int row=0; row<this.rows; row++)
 		{
-			for (int col = 0; col < Model.cols; col++)
+			for (int col = 0; col < this.cols; col++)
 			{
-				c =  Model.boardData[col][row];
+				c =  Model.getGameBoard().getLetterAtPos(row, col);
 				Log.d(TAG, "printBoardData: col " + col + " row " + row + ": " + c);
 			}
 		}
 
 		String rowStr = "";
-		for (int row=0; row<Model.rows; row++)
+		for (int row=0; row<this.rows; row++)
 		{
 			rowStr = "";
-			for (int col = 0; col < Model.cols; col++)
+			for (int col = 0; col < this.cols; col++)
 			{
-				c =  Model.boardData[col][row];
+				c =  Model.getGameBoard().getLetterAtPos(row, col);
 				rowStr += " ";
 				rowStr += c;
 			}
@@ -198,9 +234,10 @@ public class BoardFragment extends Fragment {
 	}
 
 	/*
+	DEPRECATED - SINGLE PLAYER
 	Convert the list of available letters into an array for picking from
 	 */
-	private void createLettersArray()
+	/*private void createLettersArray()
 	{
 		Log.d(TAG, "createLettersArray");
 
@@ -212,9 +249,13 @@ public class BoardFragment extends Fragment {
 			Model.letterSetArray.add(c);
 		}
 		Log.d( TAG, "createLettersArray: Model.letterSetArray: " + Model.letterSetArray );
-	}
+	}*/
 
-	private Character getRandomLetter()
+	/**
+	 * DEPRECATED - SINGLE PLAYER
+	 * @return
+	 */
+	/*private Character getRandomLetter()
 	{
 		int rand = -1;
 		Character randLetter = new Character('x');
@@ -228,7 +269,7 @@ public class BoardFragment extends Fragment {
 		Log.d( TAG, "getRandomLetter: " + randLetter );
 
 		return randLetter;
-	}
+	}*/
 
 	View.OnClickListener onLetterButtonClick = new View.OnClickListener()
 	{
@@ -236,10 +277,12 @@ public class BoardFragment extends Fragment {
 		//Log.d( TAG, "onLetterButtonClick: " + b.getText() );
 		public void onClick(View v)
 		{
-			PositionObj p = (PositionObj) v.getTag();
-			c = Model.boardData[ p.col ][ p.row ];
-			Log.d( TAG, "onLetterButtonClick: " +  p.toString() + ": " + c);
-			GameManager.processMove( p );
+//			PositionObj p = (PositionObj) v.getTag();
+			TileData td = (TileData) v.getTag();
+//			c = Model.boardData[ p.col ][ p.row ];
+			c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());
+			Log.d( TAG, "onLetterButtonClick: " +  td.toString() + ": " + c);
+			GameManager.processTileSelection(td);
 			updateActivity();
 		}
 	};

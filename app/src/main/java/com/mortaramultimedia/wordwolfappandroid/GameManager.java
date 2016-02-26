@@ -3,16 +3,21 @@ package com.mortaramultimedia.wordwolfappandroid;
 import android.app.Activity;
 import android.util.Log;
 
+import com.mortaramultimedia.wordwolf.shared.messages.TileData;
+
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
+
 import java.util.ArrayList;
+
 
 public class GameManager
 {
 	private static String TAG = "GameManager";
 	private static Activity boardActivity;
 
-	public static Character getLetterAtPosition( PositionObj p )
+	public static Character getLetterAtPosition( TileData td )
 	{
-		Character c = Model.boardData[ p.col ][ p.row ];
+		Character c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());
 		return c;
 	}
 
@@ -25,25 +30,24 @@ public class GameManager
 	public static void startNewWord()
 	{
 		Log.d( TAG, "startNewWord" );
-		Model.moves = new ArrayList<PositionObj>();
+		Model.selectedTiles = new ArrayList<TileData>();
 	}
 
-	public static void processMove( PositionObj p )
+	public static void processTileSelection( TileData td )
 	{
-		Character c = getLetterAtPosition( p );
-		Log.d( TAG, "processMove: " +  p.toString() + ": " + c);
+		Character c = getLetterAtPosition(td);
+		Log.d( TAG, "processTileSelection: " +  td.toString() + ": " + c);
 
-		// first move
-		if ( Model.moves.size() == 0 )
+		// first selected tile
+		if ( Model.selectedTiles.size() == 0 )
 		{
-			// Model.moves = new ArrayList<PositionObj>();
-			Model.moves.add( p );
+			Model.selectedTiles.add(td);
 		}
 		else
 		{
-			if ( isValidMove( p ) )
+			if ( isValidTileSelection(td) )
 			{
-				handleValidMove( p );
+				handleValidMove(td);
 			}
 			else
 			{
@@ -54,10 +58,10 @@ public class GameManager
 		printMoves();
 	}
 
-	private static void handleValidMove( PositionObj p )
+	private static void handleValidMove( TileData td )
 	{
 		Log.d(TAG, "handleValidMove: move is ok");
-		Model.moves.add(p);
+		Model.selectedTiles.add(td);
 	}
 
 	private static void handleInvalidMove()
@@ -65,18 +69,18 @@ public class GameManager
 		Log.d(TAG, "handleInvalidMove: MOVE INVALID");
 	}
 
-	private static Boolean isValidMove( PositionObj p )
+	private static Boolean isValidTileSelection( TileData td )
 	{
-		PositionObj lastMove = Model.moves.get( Model.moves.size() - 1 );
-		Boolean sameCol = ( p.col == lastMove.col );
-		Boolean sameRow = ( p.row == lastMove.row );
-		Boolean adjCol  = ( Math.abs( p.col - lastMove.col ) == 1 );
-		Boolean adjRow  = ( Math.abs( p.row - lastMove.row ) == 1 );
+		TileData lastTileSelected = Model.selectedTiles.get( Model.selectedTiles.size() - 1 );
+		Boolean sameCol = ( td.getCol() == lastTileSelected.getCol() );
+		Boolean sameRow = ( td.getRow() == lastTileSelected.getRow() );
+		Boolean adjCol  = ( Math.abs( td.getCol() - lastTileSelected.getCol() ) == 1 );
+		Boolean adjRow  = ( Math.abs( td.getRow() - lastTileSelected.getRow() ) == 1 );
 
-		Log.d( TAG, "isValidMove: sameCol: " + sameCol );
-		Log.d( TAG, "isValidMove: sameRow: " + sameRow );
-		Log.d( TAG, "isValidMove: adjCol:  " + adjCol );
-		Log.d( TAG, "isValidMove: adjRow:  " + adjRow );
+		Log.d( TAG, "isValidTileSelection: sameCol: " + sameCol );
+		Log.d( TAG, "isValidTileSelection: sameRow: " + sameRow );
+		Log.d( TAG, "isValidTileSelection: adjCol:  " + adjCol );
+		Log.d( TAG, "isValidTileSelection: adjRow:  " + adjRow );
 
 
 		// if same move as last, it's invalid
@@ -91,7 +95,7 @@ public class GameManager
 		}
 		else
 		{
-			Log.d( TAG, "isValidMove: UNHANDLED CASE" );
+			Log.d( TAG, "isValidTileSelection: UNHANDLED CASE" );
 			return false;
 		}
 		//TODO:insert case for using a button already selected
@@ -102,11 +106,11 @@ public class GameManager
 	{
 		String str = "";
 		Character c = 'g';
-		if ( Model.moves != null && Model.moves.size() > 0 )
+		if ( Model.selectedTiles != null && Model.selectedTiles.size() > 0 )
 		{
-			for (PositionObj move : Model.moves)
+			for (TileData td : Model.selectedTiles)
 			{
-				c = getLetterAtPosition(move);
+				c = getLetterAtPosition(td);
 				str += c;
 			}
 		}
@@ -120,7 +124,7 @@ public class GameManager
 
 	public static void printFoundWords()
 	{
-		Log.d( TAG, "printFoundWords: foundWords: " + Model.foundWords.toString() );
+		Log.d( TAG, "printFoundWords: foundWords: " + Model.validWordsThisGame.toString() );		//TODO: store found words locally? or on server? both?
 	}
 
 	public static boolean checkWordValidity()
@@ -130,28 +134,31 @@ public class GameManager
 		Boolean isValid = false;
 		String submittedWord = getWordSoFar();
 
+		//TODO: TEMPORARY!!!!!!!!!! LOAD REAL DICTIONARY!!!!!!!!!!!!!!!
+		isValid = true;	// all words are valid!!!!!!!!!!!
+
 		//TODO: check dictionary
 		if ( submittedWord.length() == 0 )
 		{
 			Log.w( TAG, "checkWordValidity: word string is empty" );
 			isValid =  false;
 		}
-		else if( Model.globalDictionary == null )
+		else if( Model.clientDictionary == null )
 		{
-			Log.w( TAG, "checkWordValidity: global dictionary is null" );
+			Log.w( TAG, "checkWordValidity: client dictionary is null" );
 			isValid =  false;
 		}
-		else if ( Model.globalDictionary.size() == 0 )
+		else if ( Model.clientDictionary.size() == 0 )
 		{
-			Log.w( TAG, "checkWordValidity: global dictionary is empty" );
+			Log.w( TAG, "checkWordValidity: client dictionary is empty" );
 			isValid =  false;
 		}
-		else if ( !Model.globalDictionary.containsValue( submittedWord ) )
+		else if ( !Model.clientDictionary.containsValue( submittedWord ) )
 		{
-			Log.d( TAG, "checkWordValidity: word not found: " + submittedWord );
+			Log.d( TAG, "checkWordValidity: word not found in client dictionary: " + submittedWord );
 			isValid = false;
 		}
-		else if ( Model.globalDictionary.containsValue( submittedWord ) )
+		else if ( Model.clientDictionary.containsValue( submittedWord ) )
 		{
 			Log.d( TAG, "checkWordValidity: FOUND: " + submittedWord );
 			isValid = true;

@@ -2,6 +2,8 @@ package com.mortaramultimedia.wordwolfappandroid.data;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 
@@ -28,6 +30,13 @@ public class Model
 //	private static Boolean dbTestOK 	= false;
 	private static Boolean loggedIn 	= false;
 	private static Integer score 		= 0;
+
+	// moved from old single-player Model
+	public static ArrayList<TileData> selectedTiles;
+	public static ArrayList<String> validWordsThisGame;
+	public static HashMap<String, String> clientDictionary;
+
+	public static Boolean DEV_DEBUG_MODE = true;				// custom debug flag for developer use
 
 
 	////////////////////////
