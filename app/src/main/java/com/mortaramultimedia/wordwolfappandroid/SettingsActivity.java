@@ -10,6 +10,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
+
+
 public class SettingsActivity extends Activity {
 
 	public static final String TAG = "SettingsActivity";

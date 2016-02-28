@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.constants.Constants;
 import com.mortaramultimedia.wordwolf.shared.messages.ConnectToDatabaseResponse;
+import com.mortaramultimedia.wordwolf.shared.messages.CreateGameResponse;
 import com.mortaramultimedia.wordwolf.shared.messages.LoginResponse;
 import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentRequest;
 import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentResponse;
@@ -64,6 +65,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 
 		createUIReferences();
 		loginButton.setVisibility(View.INVISIBLE);
+		chooseOpponentButton.setVisibility(View.INVISIBLE);
 		updateUI();
 
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
@@ -125,9 +127,6 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		{
 			opponentUsernameText.setText(Model.getOpponentUsername());
 		}
-
-		// Choose Opponent button
-		chooseOpponentButton.setVisibility(View.INVISIBLE);
 	}
 
 	/*private void connectToServer()	//TODO - implement
@@ -204,6 +203,8 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	 */
 	private void launchChooseOpponentActivity()
 	{
+		Log.d(TAG, "launchChooseOpponentActivity");
+
 		// create an Intent for launching the Choose Opponent Activity, with optional additional params
 		Context thisContext = ConnectionsActivity.this;
 		Intent intent = new Intent(thisContext, ChooseOpponentActivity.class);
@@ -288,6 +289,21 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		{
 			handleSelectOpponentResponse(((SelectOpponentResponse) obj));
 		}
+		else if(obj instanceof CreateGameResponse)
+		{
+			Log.d(TAG, "handleIncomingObject: CreateGameResponse CAME IN: " + obj);
+
+			// store the GameBoard and game duration in the Model
+			CreateGameResponse response = (CreateGameResponse) obj;
+			Model.setGameBoard(response.getGameBoard());
+			Model.setGameDurationMS(response.getGameDurationMS());
+
+			Log.d(TAG, "handleIncomingObject: GAME BOARD RECEIVED: \n");
+			Model.getGameBoard().printBoardData();
+
+			Log.d(TAG, "handleIncomingObject: ***STARTING GAME***");
+			launchBoardActivity();
+		}
 		else
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
@@ -343,6 +359,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
 			Model.setOpponentUsername(response.getSourceUserName());
+			launchGameSetupActivity();
 		}
 		else
 		{
@@ -350,4 +367,35 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		}
 	}
 
+	/**
+	* Launch the Game Setup Activity
+	*/
+	private void launchGameSetupActivity()
+	{
+		Log.d(TAG, "launchGameSetupActivity");
+
+		// create an Intent for launching the Game Setup Activity, with optional additional params
+		Context thisContext = ConnectionsActivity.this;
+		Intent intent = new Intent(thisContext, GameSetupActivity.class);
+		intent.putExtra("testParam", "testValue");                        //optional params
+
+		// start the activity
+		startActivity(intent);
+	}
+
+	/**
+	 * Launch the Board Activity
+	 */
+	private void launchBoardActivity()
+	{
+		Log.d(TAG, "launchBoardActivity from ConnectionsActivity");
+
+		// create an Intent for launching the Board Activity, with optional additional params
+		Context thisContext = ConnectionsActivity.this;
+		Intent intent = new Intent(thisContext, BoardActivity.class);
+		intent.putExtra("testParam", "testValue");                        //optional params
+
+		// start the activity
+		startActivity(intent);
+	}
 }

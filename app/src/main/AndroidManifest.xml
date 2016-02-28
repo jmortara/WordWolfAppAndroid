@@ -44,7 +44,7 @@
 			android:label="@string/title_activity_login">
 		</activity>
 		<activity
-			android:name=".BoardActivity"
+			android:name=".activities.BoardActivity"
 			android:label="@string/title_activity_board"
 			android:parentActivityName=".SettingsActivity">
 			<meta-data
@@ -54,10 +54,10 @@
 		<activity
 			android:name=".DictionaryActivity"
 			android:label="@string/title_activity_dictionary"
-			android:parentActivityName=".BoardActivity">
+			android:parentActivityName=".activities.BoardActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="com.mortaramultimedia.wordwolfappandroid.BoardActivity"/>
+				android:value=".activities.BoardActivity"/>
 		</activity>
 		<!--
 			 ATTENTION: This was auto-generated to add Google Play services to your project for

@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.fragments;
 
 /**
  * Created by Jason Mortara on 11/1/14.
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 
 import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
 import com.mortaramultimedia.wordwolf.shared.messages.TileData;
+import com.mortaramultimedia.wordwolfappandroid.GameManager;
+import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 
 /**
@@ -280,7 +282,7 @@ public class BoardFragment extends Fragment {
 //			PositionObj p = (PositionObj) v.getTag();
 			TileData td = (TileData) v.getTag();
 //			c = Model.boardData[ p.col ][ p.row ];
-			c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());
+			c = Model.getGameBoard().getLetterAtPos(td.getCol(), td.getRow());		//TODO: this is reversed. Change them in the common GameBoard method.
 			Log.d( TAG, "onLetterButtonClick: " +  td.toString() + ": " + c);
 			GameManager.processTileSelection(td);
 			updateActivity();

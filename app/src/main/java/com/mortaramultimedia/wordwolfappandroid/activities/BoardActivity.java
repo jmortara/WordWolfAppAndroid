@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,12 +10,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
+import com.mortaramultimedia.wordwolfappandroid.DictionaryActivity;
+import com.mortaramultimedia.wordwolfappandroid.GameManager;
+import com.mortaramultimedia.wordwolfappandroid.Model;
+import com.mortaramultimedia.wordwolfappandroid.R;
+
 import java.util.ArrayList;
 
 /**
  * Created by Jason Mortara on 11/15/14.
  */
-public class BoardActivity extends Activity implements BoardFragment.OnFragmentInteractionListener {
+public class BoardActivity extends Activity implements BoardFragment.OnFragmentInteractionListener
+{
 
 	public static final String TAG = "BoardActivity";
 	TextView wordSoFarText;

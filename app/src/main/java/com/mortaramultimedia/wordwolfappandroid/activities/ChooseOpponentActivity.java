@@ -3,18 +3,12 @@ package com.mortaramultimedia.wordwolfappandroid.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.constants.*;
 import com.mortaramultimedia.wordwolf.shared.messages.*;
@@ -24,7 +18,6 @@ import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -133,6 +126,21 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		{
 			handleSelectOpponentResponse(((SelectOpponentResponse) obj));
 		}
+		else if(obj instanceof CreateGameResponse)
+		{
+			Log.d(TAG, "handleIncomingObject: CreateGameResponse CAME IN: " + obj);
+
+			// store the GameBoard and game duration in the Model
+			CreateGameResponse response = (CreateGameResponse) obj;
+			Model.setGameBoard(response.getGameBoard());
+			Model.setGameDurationMS(response.getGameDurationMS());
+
+			Log.d(TAG, "handleIncomingObject: GAME BOARD RECEIVED: \n");
+			Model.getGameBoard().printBoardData();
+
+			Log.d(TAG, "handleIncomingObject: ***STARTING GAME***");
+			launchBoardActivity();
+		}
 		else
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
@@ -147,6 +155,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		if (response.getRequestAccepted())
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
+			Model.setOpponentUsername(response.getSourceUserName());
 			launchGameSetupActivity();
 		}
 		else
@@ -170,4 +179,21 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		// start the activity
 		startActivity(intent);
 	}
+
+	/**
+	 * Launch the Board Activity
+	 */
+	private void launchBoardActivity()
+	{
+		Log.d(TAG, "launchBoardActivity from ChooseOpponentActivity");
+
+		// create an Intent for launching the Board Activity, with optional additional params
+		Context thisContext = ChooseOpponentActivity.this;
+		Intent intent = new Intent(thisContext, BoardActivity.class);
+		intent.putExtra("testParam", "testValue");                        //optional params
+
+		// start the activity
+		startActivity(intent);
+	}
+
 }

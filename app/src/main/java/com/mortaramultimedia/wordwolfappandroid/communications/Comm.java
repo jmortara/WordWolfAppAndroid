@@ -150,6 +150,7 @@ public class Comm
 		Log.d(TAG, "handleProgressUpdate: **************************** " + obj);
 		if(currentActivity != null && obj != null)
 		{
+			Log.d(TAG, "handleProgressUpdate: forwarding object to currentActivity: " + currentActivity.toString());
 			currentActivity.handleIncomingObject(obj);
 		}
 	}

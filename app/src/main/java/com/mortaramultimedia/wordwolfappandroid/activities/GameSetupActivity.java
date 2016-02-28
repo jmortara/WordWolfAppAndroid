@@ -3,29 +3,20 @@ package com.mortaramultimedia.wordwolfappandroid.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mortaramultimedia.wordwolf.shared.messages.CreateGameRequest;
-import com.mortaramultimedia.wordwolf.shared.messages.CreateGameResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
-import com.mortaramultimedia.wordwolf.shared.messages.GetPlayerListResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.SimpleMessage;
-import com.mortaramultimedia.wordwolfappandroid.BoardActivity;
+import com.mortaramultimedia.wordwolf.shared.messages.*;
+
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 public class GameSetupActivity extends Activity implements IExtendedAsyncTask
@@ -128,7 +119,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	 */
 	private void launchBoardActivity()
 	{
-		Log.d(TAG, "launchBoardActivity");
+		Log.d(TAG, "launchBoardActivity from GameSetupActivity");
 
 		// create an Intent for launching the Board Activity, with optional additional params
 		Context thisContext = GameSetupActivity.this;
