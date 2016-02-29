@@ -18,10 +18,12 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
 import com.mortaramultimedia.wordwolf.shared.messages.TileData;
 import com.mortaramultimedia.wordwolfappandroid.GameManager;
+import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 
@@ -48,6 +50,7 @@ public class BoardFragment extends Fragment {
 	GameBoard gameBoardData;
 	GridLayout gl;
 	ArrayList<Button> buttons;
+	ArrayList<ArrayList> buttonViews2d;
 	int item;
 	int rows;
 	int cols;
@@ -125,15 +128,16 @@ public class BoardFragment extends Fragment {
 
 
 		gl = new GridLayout( getActivity() );
-		gl.setLayoutParams( new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT) );
-		gl.setColumnCount( this.cols );
-		gl.setRowCount( this.rows );
+		gl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+		gl.setColumnCount(this.cols);
+		gl.setRowCount(this.rows);
 		gl.setBackgroundColor(0xDEE1F7);
 
 
 
 		Button newButton;
 		buttons = new ArrayList<Button>();
+		ArrayList<Button> buttonCol;
 		Character c = 'y';
 		LinearLayout rowLayout;
 		String debugStr = "";
@@ -148,8 +152,12 @@ public class BoardFragment extends Fragment {
         Log.d(TAG, "onCreateView: view buttonWidth: " + buttonWidth);
         Log.d(TAG, "onCreateView: view buttonHeight: " + buttonHeight);
 
+		buttonViews2d = new ArrayList<ArrayList>();
+
 		for(int row=0; row<this.rows; row++)
 		{
+			buttonCol = new ArrayList<Button>();
+
 			//rowLayout = new LinearLayout( getActivity() );
 			for (int col=0; col<this.cols; col++)
 			{
@@ -164,17 +172,21 @@ public class BoardFragment extends Fragment {
 				newButton = new Button( getActivity() );
 				TileData tagObj = new TileData( row, col, c, false );
 
-				newButton.setTag( tagObj );
-				newButton.setLayoutParams( new LinearLayout.LayoutParams( buttonWidth, buttonHeight ) );
+				newButton.setTag(tagObj);
+				newButton.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth, buttonHeight));
 				newButton.setText(new String(c.toString() + debugStr));
 				newButton.setTextSize(buttonWidth / 4);
 				newButton.setPadding(1, 1, 1, 1);
-				newButton.setOnClickListener( onLetterButtonClick );
-				buttons.add( newButton );
+				newButton.setOnClickListener(onLetterButtonClick);
+				buttons.add(newButton);
+				buttonCol.add(newButton);
 				gl.addView( newButton );
 			}
 			//gl.addView( rowLayout );
+			buttonViews2d.add(buttonCol);
 		}
+
+		Log.d(TAG, "TEST BUTTON IS AT :::::::::::::::::: " + getButtonViewAtPosition(1, 3).getTag());
 
 		return gl;
 		//setContentView(gl);
@@ -182,6 +194,11 @@ public class BoardFragment extends Fragment {
 		// Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_board, container, false);
 
+	}
+
+	public Button getButtonViewAtPosition(int row, int col)
+	{
+		return (Button) buttonViews2d.get(row).get(col);
 	}
 
 	/*private void createBoardData()
@@ -289,15 +306,80 @@ public class BoardFragment extends Fragment {
 		//Log.d( TAG, "onLetterButtonClick: " + b.getText() );
 		public void onClick(View v)
 		{
-//			PositionObj p = (PositionObj) v.getTag();
 			TileData td = (TileData) v.getTag();
 //			c = Model.boardData[ p.col ][ p.row ];
-			c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());		//TODO: this is reversed. Change them in the common GameBoard method.
-			Log.d( TAG, "onLetterButtonClick: " +  td.toString() + ": " + c);
+			c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());
+			Log.d(TAG, "onLetterButtonClick: " + td.toString() + ": " + c);
+
+			Button b = (Button) v;
+			updateLetterButtonColor(b, td, "selected");
+
 			GameManager.processTileSelection(td);
 			updateActivity();
 		}
 	};
+
+	/**
+	 * Highlighting of letters as word is constructed (if it's the first letter, or the next valid letter)
+	 * @param button
+	 * @param td
+	 * @param type ("selected", "unselected")
+	 */
+	private void updateLetterButtonColor(Button button, TileData td, String type)
+	{
+		//Log.d( TAG, "updateLetterButtonColor" );
+
+		if(Model.selectedTiles.size() == 0 || (Model.selectedTiles.size() > 0 && GameManager.isValidTileSelection(td)))
+		{
+			Log.d( TAG, "VALID TILE SELECTION" );
+			final int BG_COLOR_LIGHT = getResources().getColor(R.color.button_material_light);
+			final int BG_COLOR_DARK  = getResources().getColor(R.color.button_material_dark);
+			int bgColor = BG_COLOR_LIGHT;
+			if(type.equals("selected"))
+			{
+				bgColor = BG_COLOR_DARK;
+			}
+			else if (type.equals("unselected"))
+			{
+				bgColor = BG_COLOR_LIGHT;
+			}
+			button.setBackgroundColor(bgColor);
+		}
+	}
+
+	/**
+	 * Should be called only after all the TileDatas are reset in the Model.gameBoard
+	 */
+	public void resetAllTileViews()
+	{
+		Log.d( TAG, "resetAllTileViews" );
+
+		TileData td;
+		Button button;
+		for (int row=0; row<this.rows; row++)
+		{
+			for (int col = 0; col < this.cols; col++)
+			{
+				td = Model.getGameBoard().getTileDataAtPos(row, col);
+				button = getButtonViewAtPosition(row, col);
+				updateLetterButtonColor(button, td, "unselected");
+			}
+		}
+
+
+		/*for(int row=0; row < buttonViews2d.size(); row++)
+		{
+			List<Button> colList = (List<Button>) buttonViews2d.get(row);
+			for(int col=0; col<colList.size(); col++)
+			{
+				Button button = (Button) colList.get(col);
+				if(button != null)
+				{
+					updateLetterButtonColor(button, null, "selected");
+				}
+			}
+		}*/
+	}
 
 	private void updateActivity()
 	{

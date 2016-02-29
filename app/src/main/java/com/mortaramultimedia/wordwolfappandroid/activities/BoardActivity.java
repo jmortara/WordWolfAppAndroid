@@ -93,6 +93,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 
 		// reset the word and the word display
 		GameManager.startNewWord();
+		BoardFragment boardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.boardFragment);	//TODO: make class var
+		boardFragment.resetAllTileViews();
 		updateWordDisplay();
 		updateScoreDisplay();
 	}

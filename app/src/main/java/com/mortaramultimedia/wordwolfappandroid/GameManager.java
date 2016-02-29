@@ -30,6 +30,17 @@ public class GameManager
 	public static void startNewWord()
 	{
 		Log.d( TAG, "startNewWord" );
+
+		// reset all TileData to default state
+		if(Model.selectedTiles != null && Model.selectedTiles.size() > 0)
+		{
+			for(TileData td : Model.selectedTiles)
+			{
+				td.setSelected(false);
+			}
+		}
+
+		// start a new list of TileDatas for a new word
 		Model.selectedTiles = new ArrayList<TileData>();
 	}
 
@@ -47,29 +58,30 @@ public class GameManager
 		{
 			if ( isValidTileSelection(td) )
 			{
-				handleValidMove(td);
+				handleValidTileSelection(td);
 			}
 			else
 			{
-				handleInvalidMove();
+				handleInvalidTileSelection();
 			}
 		}
 
 		printMoves();
 	}
 
-	private static void handleValidMove( TileData td )
+	private static void handleValidTileSelection(TileData td)
 	{
-		Log.d(TAG, "handleValidMove: move is ok");
+		Log.d(TAG, "handleValidTileSelection: move is ok");
+		td.setSelected(true);
 		Model.selectedTiles.add(td);
 	}
 
-	private static void handleInvalidMove()
+	private static void handleInvalidTileSelection()
 	{
-		Log.d(TAG, "handleInvalidMove: MOVE INVALID");
+		Log.d(TAG, "handleInvalidTileSelection: MOVE INVALID");
 	}
 
-	private static Boolean isValidTileSelection( TileData td )
+	public static Boolean isValidTileSelection( TileData td )
 	{
 		TileData lastTileSelected = Model.selectedTiles.get( Model.selectedTiles.size() - 1 );
 		Boolean sameCol = ( td.getCol() == lastTileSelected.getCol() );
