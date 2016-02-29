@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,6 +115,15 @@ public class BoardFragment extends Fragment {
 		printBoardData();
 		GameManager.init();
 
+		// DisplayMetrics method of getting nec width and height needed to size buttons
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		boardActivity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+		int dmWidth  = displayMetrics.widthPixels;
+		int dmHeight = displayMetrics.heightPixels;
+		Log.d(TAG, "onCreateView: dmWidth:  " + dmWidth);
+		Log.d(TAG, "onCreateView: dmHeight: " + dmHeight);
+
+
 		gl = new GridLayout( getActivity() );
 		gl.setLayoutParams( new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT) );
 		gl.setColumnCount( this.cols );
@@ -128,15 +138,15 @@ public class BoardFragment extends Fragment {
 		LinearLayout rowLayout;
 		String debugStr = "";
 
-//        int viewWidth    = gl.getWidth();
-//        int viewHeight   = gl.getHeight();
-		int buttonWidth  = 260 / ( this.cols + 1 );
-		int buttonHeight = 260 / ( this.rows + 1 );
+        int viewWidth    = gl.getWidth();
+        int viewHeight   = gl.getHeight();
+		int buttonWidth  = dmWidth  / ( this.cols + 1 );
+		int buttonHeight = buttonWidth;		//dmHeight / ( this.rows + 1 );
 
-//        Log.d(TAG, "onCreateView: view width: " + viewWidth);
-//        Log.d(TAG, "onCreateView: view viewHeight: " + viewHeight);
-//        Log.d(TAG, "onCreateView: view buttonWidth: " + buttonWidth);
-//        Log.d(TAG, "onCreateView: view buttonHeight: " + buttonHeight);
+        Log.d(TAG, "onCreateView: view width: " + viewWidth);
+        Log.d(TAG, "onCreateView: view viewHeight: " + viewHeight);
+        Log.d(TAG, "onCreateView: view buttonWidth: " + buttonWidth);
+        Log.d(TAG, "onCreateView: view buttonHeight: " + buttonHeight);
 
 		for(int row=0; row<this.rows; row++)
 		{
@@ -152,12 +162,12 @@ public class BoardFragment extends Fragment {
 				}
 
 				newButton = new Button( getActivity() );
-				TileData tagObj = new TileData( col, row, c, false );
+				TileData tagObj = new TileData( row, col, c, false );
 
 				newButton.setTag( tagObj );
 				newButton.setLayoutParams( new LinearLayout.LayoutParams( buttonWidth, buttonHeight ) );
 				newButton.setText(new String(c.toString() + debugStr));
-				newButton.setTextSize(10);
+				newButton.setTextSize(buttonWidth / 4);
 				newButton.setPadding(1, 1, 1, 1);
 				newButton.setOnClickListener( onLetterButtonClick );
 				buttons.add( newButton );
@@ -282,7 +292,7 @@ public class BoardFragment extends Fragment {
 //			PositionObj p = (PositionObj) v.getTag();
 			TileData td = (TileData) v.getTag();
 //			c = Model.boardData[ p.col ][ p.row ];
-			c = Model.getGameBoard().getLetterAtPos(td.getCol(), td.getRow());		//TODO: this is reversed. Change them in the common GameBoard method.
+			c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());		//TODO: this is reversed. Change them in the common GameBoard method.
 			Log.d( TAG, "onLetterButtonClick: " +  td.toString() + ": " + c);
 			GameManager.processTileSelection(td);
 			updateActivity();

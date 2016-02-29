@@ -999,7 +999,27 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 
 			// start the game timer
 			startGameTimer();
+
+//            launchBoardActivity();
 		}
+
+        /**
+         * Launch the Board Activity
+         */
+        private void launchBoardActivity()
+        {
+            Log.d(TAG, "launchBoardActivity from ServerActivity");
+
+            // create an Intent for launching the Board Activity, with optional additional params
+            Context thisContext = ServerActivity.this;
+            Intent intent = new Intent(thisContext, BoardActivity.class);
+            intent.putExtra("testParam", "testValue");                        //optional params
+
+            // start the activity
+            startActivity(intent);
+        }
+
+
 
 		private void handleGameMoveResponse(GameMoveResponse response)
 		{
