@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
 import com.mortaramultimedia.wordwolf.shared.messages.TileData;
+
 import com.mortaramultimedia.wordwolfappandroid.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
@@ -47,14 +48,14 @@ public class BoardFragment extends Fragment {
 	private String mParam1;
 	private String mParam2;
 
-	GameBoard gameBoardData;
-	GridLayout gl;
-	ArrayList<Button> buttons;
-	ArrayList<ArrayList> buttonViews2d;
-	int item;
-	int rows;
-	int cols;
-	BoardActivity boardActivity;
+	private GameBoard gameBoardData;
+	private GridLayout gl;
+	private ArrayList<Button> buttons;
+	private ArrayList<ArrayList> buttonViews2d;
+	private int item;
+	private int rows;
+	private int cols;
+	private BoardActivity boardActivity;
 
 	private OnFragmentInteractionListener mListener;
 
@@ -110,6 +111,8 @@ public class BoardFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		Log.d(TAG, "onCreateView");
+
+		//TODO - refactor this method for clarity
 
 		boardActivity = (BoardActivity) getActivity();
 
@@ -192,9 +195,13 @@ public class BoardFragment extends Fragment {
 		//setContentView(gl);
 
 		// Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_board, container, false);
-
+		// return inflater.inflate(R.layout.fragment_board, container, false);
 	}
+
+
+
+	//////////////////////////////////////////
+	// BOARD VIEW AND LETTER BUTTON VIEWS
 
 	public Button getButtonViewAtPosition(int row, int col)
 	{

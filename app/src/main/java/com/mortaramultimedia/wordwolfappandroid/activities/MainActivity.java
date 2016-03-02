@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.mortaramultimedia.wordwolfappandroid.Model;
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.SettingsActivity;
 
@@ -64,12 +64,12 @@ public class MainActivity extends Activity {
 
 		statusText.setText( getResources().getString(R.string.loading_dictionary));
 
-		Model.globalDictionary = new HashMap<String, String>();
-		Log.d( TAG, "populateDictionary: globalDictionary length before load: " + Model.globalDictionary.size() );
+		Model.clientDictionary = new HashMap<String, String>();
+		Log.d( TAG, "populateDictionary: clientDictionary length before load: " + Model.clientDictionary.size() );
 
-		Model.globalDictionary = loadDictionary(this);
-		Log.d( TAG, "populateDictionary: globalDictionary length after load:  " + Model.globalDictionary.size() );
-		statusText.setText(getResources().getString(R.string.loaded_dictionary) + " " + Model.globalDictionary.size() + " words. ");
+		Model.clientDictionary = loadDictionary(this);
+		Log.d( TAG, "populateDictionary: clientDictionary length after load:  " + Model.clientDictionary.size() );
+		statusText.setText(getResources().getString(R.string.loaded_dictionary) + " " + Model.clientDictionary.size() + " words. ");
 		setStartButtonVisibility(View.VISIBLE);
 
 		// EditText editText = (EditText) findViewById(R.id.dictEditText);

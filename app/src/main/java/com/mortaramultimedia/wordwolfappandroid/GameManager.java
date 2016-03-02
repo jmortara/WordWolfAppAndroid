@@ -134,9 +134,9 @@ public class GameManager
 		Log.d( TAG, "printMoves: the word so far: " + getWordSoFar() );
 	}
 
-	public static void printFoundWords()
+	public static void printValidWordsThisGame()
 	{
-		Log.d( TAG, "printFoundWords: foundWords: " + Model.validWordsThisGame.toString() );		//TODO: store found words locally? or on server? both?
+		Log.d( TAG, "printValidWordsThisGame: foundWords: " + Model.validWordsThisGame.toString() );		//TODO: store found words locally? or on server? both?
 	}
 
 	public static boolean checkWordValidity()

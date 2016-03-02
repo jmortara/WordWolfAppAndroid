@@ -11,11 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
 
 
 public class SettingsActivity extends Activity {
 
 	public static final String TAG = "SettingsActivity";
+	private int userNumRows = 3;
+	private int userNumCols = 3;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +70,11 @@ public class SettingsActivity extends Activity {
 		int firstChar = Integer.parseInt( selectionStr.substring(0, 1) );
 		int lastChar  = Integer.parseInt( selectionStr.substring( selectionStr.length() - 1, selectionStr.length() ) );
 
-		Model.cols = firstChar;
-		Model.rows = lastChar;
+		this.userNumCols= firstChar;
+		this.userNumRows = lastChar;
 
-		Log.d(TAG, "handleNextButtonClick: cols: " + Model.cols);
-		Log.d(TAG, "handleNextButtonClick: rows: " + Model.rows);
+		Log.d(TAG, "handleNextButtonClick: user specified num cols: " + this.userNumCols);
+		Log.d(TAG, "handleNextButtonClick: user specified num rows: " + this.userNumRows);
 	}
 
 

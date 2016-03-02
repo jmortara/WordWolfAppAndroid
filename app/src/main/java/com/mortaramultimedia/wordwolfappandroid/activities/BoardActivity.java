@@ -1,22 +1,30 @@
 package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.mortaramultimedia.wordwolf.shared.messages.EndGameRequest;
+
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
+import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
 import com.mortaramultimedia.wordwolfappandroid.DictionaryActivity;
 import com.mortaramultimedia.wordwolfappandroid.GameManager;
-import com.mortaramultimedia.wordwolfappandroid.Model;
 import com.mortaramultimedia.wordwolfappandroid.R;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 /**
  * Created by Jason Mortara on 11/15/14.
@@ -25,8 +33,9 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 {
 
 	public static final String TAG = "BoardActivity";
-	TextView wordSoFarText;
-	TextView scoreText;
+	private TextView wordSoFarText;
+	private TextView scoreText;
+	private Timer gameTimer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,18 +45,18 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		init();
 	}
 
-	private void init()
-	{
+	private void init() {
 		Log.d(TAG, "init");
 
 		initGameData();
 		setupBoard();
+		startGameTimer();
 	}
 
 	private void initGameData()
 	{
 		Log.d(TAG, "initGameData");
-		Model.foundWords = new ArrayList<String>();
+		Model.validWordsThisGame = new ArrayList<String>();
 	}
 
 
@@ -58,10 +67,89 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		scoreText = (TextView) findViewById(R.id.scoreText);
 	}
 
-	public void handleBoardFragmentButtonClick(View view)
+
+	///////////////////////////////////////////
+	// GAME TIMER - START AND END GAME
+
+	/**
+	 * Start the game timer, which counts down on both clients for the duration specified
+	 * in the CreateGameResponse. When complete, the game ends and the client sends
+	 * the server a related message with scores.
+	 */
+	private void startGameTimer()
+	{
+		Log.d(TAG, "startGameTimer *************************");
+
+		new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				handleGameOver();
+			}
+		}, Model.getGameDurationMS());	// end new Handler
+	}
+
+
+	/**
+	 * Handle the completion of the game timer. Ths should trigger a Game Over sequence.
+	 */
+	/*private void handleGameTimerCompleted()
+	{
+		Log.d(TAG, "handleGameTimerCompleted");
+		if(gameTimer != null)
+		{
+			gameTimer.cancel();
+		}
+		handleGameOver();
+	}*/
+
+	private void handleGameOver()
+	{
+		Log.d(TAG, "handleGameOver");
+
+		// notify the server that the game has ended
+		EndGameRequest request = new EndGameRequest(Model.getUserLogin().getUserName(), -1);
+		Comm.sendObject(request);
+
+		// show a Game Over dialog, maybe w/ some relevant params
+		showGameOverDialog(request);
+	}
+
+	private void showGameOverDialog(EndGameRequest request)
+	{
+		Log.d(TAG, "showGameOverDialog");
+
+		AlertDialog dialog = new AlertDialog.Builder(this).create();
+		dialog.setTitle("Game Over!");
+		dialog.setMessage("Your game with " + Model.getOpponentUsername() + " has ended.\nYour score: " + Model.getScore() + "\n\nRematch?");
+
+		// set up and listener for Accept button
+		dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes! Rematch!", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Log.d(TAG, "showGameOverDialog: dialog button pressed: positive");
+				//TODO: start new game without starting a new Activity
+			}
+		});
+
+		// set up and listener for Decline button
+		dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No thanks.", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				Log.d(TAG, "showGameOverDialog: dialog button pressed: negative");
+				//TODO: send to new Activity, or Choose Opponent Activity
+			}
+		});
+
+		dialog.show();
+	}
+
+
+	////////////////////////////////
+	//
+	public void handleBoardFragmentButtonClick(View view)	//TODO: remove? unused.
 	{
 		Log.d(TAG, "handleBoardFragmentButtonClick");
-
 	}
 
 	public void updateWordDisplay()
@@ -76,7 +164,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	public void updateScoreDisplay()
 	{
 		Log.d( TAG, "updateScoreDisplay" );
-		scoreText.setText( getResources().getString(R.string.score) + " " + Model.foundWords.size() );
+		scoreText.setText( getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size() );
 	}
 
 	public void handleSubmitButtonClick(View view)
@@ -87,8 +175,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		Boolean wordIsValid = GameManager.checkWordValidity();
 		if ( wordIsValid )
 		{
-			Model.foundWords.add( GameManager.getWordSoFar() );
-			GameManager.printFoundWords();
+			Model.validWordsThisGame.add( GameManager.getWordSoFar() );
+			GameManager.printValidWordsThisGame();
 		}
 
 		// reset the word and the word display
