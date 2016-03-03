@@ -309,6 +309,13 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 		{
 			handleEndGameResponse(((EndGameResponse) obj));
 		}
+		/**
+		 * If receiving a PostEndGameActionResponse...
+		 */
+		/*else if (obj instanceof PostEndGameActionResponse)
+		{
+			handleEndGameResponse(((PostEndGameActionResponse) obj));
+		}*/
 		else
 		{
 			Log.w(TAG, "handleIncomingObject: WARNING: unhandled object type! " + obj);

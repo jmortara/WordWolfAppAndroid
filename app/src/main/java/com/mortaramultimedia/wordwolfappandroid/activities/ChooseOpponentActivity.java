@@ -44,6 +44,16 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		requestPlayerList();
 	}
 
+	@Override
+	protected void onResume()
+	{
+		Log.d(TAG, "onResume");
+		super.onResume();
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+		updateUI();
+		requestPlayerList();
+	}
+
 	/**
 	 * Create the needed references to buttons and UI elements.
 	 */

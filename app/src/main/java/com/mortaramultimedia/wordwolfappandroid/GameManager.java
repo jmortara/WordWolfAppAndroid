@@ -144,10 +144,10 @@ public class GameManager
 		Log.d( TAG, "checkWordValidity: checking " + getWordSoFar() );
 
 		Boolean isValid = false;
-		String submittedWord = getWordSoFar();
+		String submittedWord = getWordSoFar().toLowerCase();
 
 		//TODO: TEMPORARY!!!!!!!!!! LOAD REAL DICTIONARY!!!!!!!!!!!!!!!
-		isValid = true;	// all words are valid!!!!!!!!!!!
+		//isValid = true;	// all words are valid!!!!!!!!!!!
 
 		//TODO: check dictionary
 		if ( submittedWord.length() == 0 )

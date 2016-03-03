@@ -14,12 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.constants.Constants;
-import com.mortaramultimedia.wordwolf.shared.messages.ConnectToDatabaseResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.CreateGameResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.LoginResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentRequest;
-import com.mortaramultimedia.wordwolf.shared.messages.SelectOpponentResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.SimpleMessage;
+import com.mortaramultimedia.wordwolf.shared.messages.*;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
@@ -372,7 +367,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	*/
 	private void launchGameSetupActivity()
 	{
-		Log.d(TAG, "launchGameSetupActivity");
+		Log.d(TAG, "launchGameSetupActivity from ConnectionsActivity");
 
 		// create an Intent for launching the Game Setup Activity, with optional additional params
 		Context thisContext = ConnectionsActivity.this;

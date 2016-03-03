@@ -41,6 +41,14 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 	}
 
+	@Override
+	protected void onResume()
+	{
+		Log.d(TAG, "onResume");
+		super.onResume();
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+	}
+
 	/**
 	 * Create the needed references to buttons and UI elements.
 	 */

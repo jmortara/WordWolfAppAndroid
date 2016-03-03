@@ -1,8 +1,6 @@
 package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,10 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mortaramultimedia.wordwolf.shared.messages.EndGameRequest;
-
-import com.mortaramultimedia.wordwolfappandroid.data.Model;
+import com.mortaramultimedia.wordwolf.shared.messages.GameMove;
+import com.mortaramultimedia.wordwolf.shared.messages.GameMoveRequest;
+import com.mortaramultimedia.wordwolf.shared.messages.TileData;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
 import com.mortaramultimedia.wordwolfappandroid.DictionaryActivity;
 import com.mortaramultimedia.wordwolfappandroid.GameManager;
@@ -32,17 +31,24 @@ import java.util.Timer;
 public class BoardActivity extends Activity implements BoardFragment.OnFragmentInteractionListener
 {
 
-	public static final String TAG = "BoardActivity";
+	private static final String TAG = "BoardActivity";
 	private TextView wordSoFarText;
 	private TextView scoreText;
-	private Timer gameTimer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_board);
 
+		//TODO - note, since this Activity does not implement IExtendedAsyncTask, it won't receive incoming objects from ServerTask
 		init();
+	}
+
+	@Override
+	protected void onResume()
+	{
+		Log.d(TAG, "onResume");
+		super.onResume();
 	}
 
 	private void init() {
@@ -69,7 +75,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 
 
 	///////////////////////////////////////////
-	// GAME TIMER - START AND END GAME
+	// GAME TIMER
 
 	/**
 	 * Start the game timer, which counts down on both clients for the duration specified
@@ -102,48 +108,6 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		handleGameOver();
 	}*/
 
-	private void handleGameOver()
-	{
-		Log.d(TAG, "handleGameOver");
-
-		// notify the server that the game has ended
-		EndGameRequest request = new EndGameRequest(Model.getUserLogin().getUserName(), -1);
-		Comm.sendObject(request);
-
-		// show a Game Over dialog, maybe w/ some relevant params
-		showGameOverDialog(request);
-	}
-
-	private void showGameOverDialog(EndGameRequest request)
-	{
-		Log.d(TAG, "showGameOverDialog");
-
-		AlertDialog dialog = new AlertDialog.Builder(this).create();
-		dialog.setTitle("Game Over!");
-		dialog.setMessage("Your game with " + Model.getOpponentUsername() + " has ended.\nYour score: " + Model.getScore() + "\n\nRematch?");
-
-		// set up and listener for Accept button
-		dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes! Rematch!", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Log.d(TAG, "showGameOverDialog: dialog button pressed: positive");
-				//TODO: start new game without starting a new Activity
-			}
-		});
-
-		// set up and listener for Decline button
-		dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No thanks.", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				Log.d(TAG, "showGameOverDialog: dialog button pressed: negative");
-				//TODO: send to new Activity, or Choose Opponent Activity
-			}
-		});
-
-		dialog.show();
-	}
-
 
 	////////////////////////////////
 	//
@@ -154,7 +118,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 
 	public void updateWordDisplay()
 	{
-		Log.d( TAG, "updateWordDisplay" );
+		Log.d(TAG, "updateWordDisplay");
 		if ( wordSoFarText != null )
 		{
 			wordSoFarText.setText( getResources().getString(R.string.word_so_far) + GameManager.getWordSoFar() );
@@ -163,8 +127,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 
 	public void updateScoreDisplay()
 	{
-		Log.d( TAG, "updateScoreDisplay" );
-		scoreText.setText( getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size() );
+		Log.d(TAG, "updateScoreDisplay");
+		scoreText.setText(getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size());
 	}
 
 	public void handleSubmitButtonClick(View view)
@@ -175,8 +139,16 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		Boolean wordIsValid = GameManager.checkWordValidity();
 		if ( wordIsValid )
 		{
+			// client
 			Model.validWordsThisGame.add( GameManager.getWordSoFar() );
 			GameManager.printValidWordsThisGame();
+
+			// server: put a copy of the sequence of TileData stored in the Model
+			// into a GameMove obj and send out for server-side validation
+			ArrayList<TileData> selectedTilesCopy = new ArrayList<TileData>(Model.selectedTiles);
+			GameMove gameMove = new GameMove(selectedTilesCopy);
+			GameMoveRequest request = new GameMoveRequest(Model.getUserLogin().getUserName(), -1, gameMove);
+			Comm.sendObject(request);
 		}
 
 		// reset the word and the word display
@@ -200,6 +172,32 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		Log.d(TAG, "onFragmentInteraction");
 	}
 
+
+	//////////////////////////////
+	// END GAME SEQUENCE
+	/**
+	 * Handle the end of the game, as triggered by the Game Timer.	//TODO - set a state in the Model so that play cannot continue on the client
+	 */
+	private void handleGameOver()
+	{
+		Log.d(TAG, "handleGameOver");
+
+		launchGameOverActivity();
+	}
+
+	/**
+	 * Launch the Game Over Activity, where the user can choose between a rematch or choosing a new opponent.
+	 */
+	private void launchGameOverActivity() {
+		Log.d(TAG, "launchGameOverActivity");
+
+		Intent intent = new Intent(BoardActivity.this, GameOverActivity.class);
+		startActivity(intent);
+	}
+
+
+	////////////////////////////////
+	//
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
