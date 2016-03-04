@@ -36,11 +36,13 @@ public class Model
 	public static ArrayList<String> validWordsThisGame;
 	public static HashMap<String, String> clientDictionary;
 
-	public static Boolean DEV_DEBUG_MODE = true;				// custom debug flag for developer use
+	public static Boolean DEV_DEBUG_MODE = false;				// custom debug flag for developer use
+
 
 
 	////////////////////////
-	// Getters & Setters
+	// GETTERS & SETTERS
+
 	public static Properties getDatabaseProps()
 	{
 		return databaseProps;
@@ -68,6 +70,10 @@ public class Model
 
 	public static void setOpponentUsername(String opponentUsername)
 	{
+		if(opponentUsername == null)
+		{
+			throw new Error("WARNING********************* null opponentUserName");
+		}
 		Model.opponentUsername = opponentUsername;
 	}
 

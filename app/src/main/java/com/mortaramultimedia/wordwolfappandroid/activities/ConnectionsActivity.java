@@ -323,6 +323,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
+				Model.setOpponentUsername(sourceUsername);
 				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername);
 				Comm.sendObject(response);
 			}

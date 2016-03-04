@@ -178,4 +178,11 @@ public class GameManager
 		return isValid;
 	}
 
+	public static void resetScore()
+	{
+		Log.d( TAG, "resetScore");
+		Model.setScore(0);
+	}
+
+
 }

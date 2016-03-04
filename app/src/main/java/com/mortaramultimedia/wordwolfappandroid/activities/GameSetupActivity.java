@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 
+import com.mortaramultimedia.wordwolfappandroid.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
@@ -34,6 +35,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game_setup);
 
+		GameManager.resetScore();
 		createUIReferences();
 		//createUIListeners();
 		updateUI();
@@ -56,7 +58,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "createUIReferences");
 		usernameText 					= (TextView) 	findViewById(R.id.usernameText);
-		opponentUsernameText 		= (TextView) 	findViewById(R.id.opponentUsernameText);
+		opponentUsernameText 			= (TextView) 	findViewById(R.id.opponentUsernameText);
 		playButton 						= (Button) 		findViewById(R.id.playButton);
 	}
 
@@ -66,6 +68,9 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	private void updateUI()
 	{
 		Log.d(TAG, "updateUI");
+
+		usernameText.setText(Model.getUserLogin().getUserName());
+		opponentUsernameText.setText(Model.getOpponentUsername());
 	}
 
 	/**
@@ -107,6 +112,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 
 			// store the GameBoard and game duration in the Model
 			CreateGameResponse response = (CreateGameResponse) obj;
+			Model.setOpponentUsername(response.getOpponentUserName());	// this may have already been set via an earlier dialog, but here it is validated by coming from the server
 			Model.setGameBoard(response.getGameBoard());
 			Model.setGameDurationMS(response.getGameDurationMS());
 

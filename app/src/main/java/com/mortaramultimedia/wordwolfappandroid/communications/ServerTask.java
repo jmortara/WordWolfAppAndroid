@@ -427,8 +427,9 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 		if (response.getRequestAccepted())
 		{
 			int movePointsAwarded = response.getPointsAwarded();
-			Model.setScore(Model.getScore() + movePointsAwarded);
-			Log.d(TAG, "handleGameMoveResponse: move accepted. New score: " + Model.getScore());
+			int newTotalScore = response.getNewScore();
+			Model.setScore(newTotalScore);
+			Log.d(TAG, "handleGameMoveResponse: move accepted for " + movePointsAwarded + " points. New score: " + Model.getScore());
 		}
 		else
 		{
@@ -444,6 +445,7 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 
 		//TODO: note that one EndGameRequest send to the server results in one EndGameResponse going to each matched player, so each will receive 2 EndGames.
 		Log.d(TAG, "handleEndGameResponse: *****GAME OVER!***** final score according to server: " + response.getFinalScoreFromServer());
+		Model.setScore(response.getFinalScoreFromServer());
 	}
 
 	private void logGameBoard(GameBoard gameBoard)

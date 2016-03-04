@@ -972,13 +972,14 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 			publishObject(response);
 			if (response.getRequestAccepted())
 			{
-				Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
+				Log.d(TAG, "handleSelectOpponentResponse: REQUEST ACCEPTED! from: " + response.getSourceUserName());
 				Model.setOpponentUsername(response.getSourceUserName());
 			}
 			else
 			{
-				Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+				Log.d(TAG, "handleSelectOpponentResponse: REQUEST REJECTED! from: " + response.getSourceUserName());
 			}
+			Log.d(TAG, "handleSelectOpponentResponse: Model.getOpponentUsername(): " + Model.getOpponentUsername());
 		}
 
 		private void handleMessageFromOpponent(OpponentBoundMessage msgObj)

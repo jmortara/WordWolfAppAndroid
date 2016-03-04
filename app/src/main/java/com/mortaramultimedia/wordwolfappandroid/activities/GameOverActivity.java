@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
+import com.mortaramultimedia.wordwolfappandroid.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
@@ -18,6 +19,7 @@ import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 public class GameOverActivity extends Activity implements IExtendedAsyncTask
 {
     private static final String TAG = "GameOverActivity";
+    private AlertDialog gameOverDialog = null;
 
 
     @Override
@@ -64,17 +66,19 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
     {
         Log.d(TAG, "showGameOverDialog");
 
-        AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("Game Over!");
-        dialog.setMessage(
-                "Your game with " + Model.getOpponentUsername() + " has ended." +
-                "\nYour score: " + Model.getScore() +
-                "\n" + Model.getOpponentUsername() + "'s score: " + response.getOpponentFinalScore() +
-                "\n\nRematch?"
-                );
+        dismissGameOverDialog();
+
+        gameOverDialog = new AlertDialog.Builder(this).create();
+        gameOverDialog.setTitle("Game Over, " + Model.getUserLogin().getUserName() + "!");
+        gameOverDialog.setMessage(
+                "Your game with " + Model.getOpponentUsername() + " has ended.\n" +
+                        "\nYour score: " + response.getFinalScoreFromServer() +
+                        "\n" + Model.getOpponentUsername() + "'s score: " + response.getOpponentFinalScore() +
+                        "\n\nRematch?"
+        );
 
         // set up and listener for Accept button
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes! Rematch!", new DialogInterface.OnClickListener() {
+        gameOverDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes! Rematch!", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d(TAG, "showGameOverDialog: dialog button pressed: positive");
@@ -90,7 +94,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         });
 
         // set up and listener for Decline button
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No thanks.\nChoose another opponent.", new DialogInterface.OnClickListener() {
+        gameOverDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No thanks.\nChoose another opponent.", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d(TAG, "showGameOverDialog: dialog button pressed: negative");
@@ -105,7 +109,17 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
             }
         });
 
-        dialog.show();
+        gameOverDialog.show();
+    }
+
+    private void dismissGameOverDialog()
+    {
+        Log.d(TAG, "dismissGameOverDialog");
+
+        if(gameOverDialog != null)
+        {
+            gameOverDialog.dismiss();
+        }
     }
 
     private void switchToChooseOpponentActivity()
@@ -190,6 +204,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         if (response.getRequestAccepted())
         {
             Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
+            GameManager.resetScore();
             Model.setOpponentUsername(response.getSourceUserName());
             switchToGameSetupActivity();
         }
