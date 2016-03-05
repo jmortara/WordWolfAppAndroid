@@ -33,12 +33,12 @@
 
     <ImageButton
         android:id="@+id/startButton"
-        android:src="@drawable/main_start_button_up"
+        android:src="@drawable/main_button_start"
         android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="handleStartButtonClick"
         android:layout_marginBottom="200dp"
+        android:onClick="handleStartButtonClick"
         />
 
     <!--Button
@@ -54,7 +54,7 @@
 
     <ImageButton
         android:id="@+id/debugButton"
-        android:src="@drawable/main_button_debug_up"
+        android:src="@drawable/main_button_debug"
         android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -65,7 +65,7 @@
 
 	<ImageButton
 		android:id="@+id/playButton"
-		android:src="@drawable/game_setup_button_play_up"
+		android:src="@drawable/game_setup_button_play"
 		android:background="@android:color/transparent"
 		android:layout_width="100dp"
 		android:layout_height="wrap_content"

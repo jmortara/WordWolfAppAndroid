@@ -104,7 +104,7 @@
 
 	<ImageButton
 		android:id="@+id/loginButton"
-		android:src="@drawable/connections_button_log_in_up"
+		android:src="@drawable/connections_button_log_in"
 		android:background="@android:color/transparent"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
 
 	<ImageButton
 		android:id="@+id/chooseOpponentButton"
-		android:src="@drawable/connections_button_choose_opponent_up"
+		android:src="@drawable/connections_button_choose_opponent"
 		android:background="@android:color/transparent"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"

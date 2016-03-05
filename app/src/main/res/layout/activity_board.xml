@@ -54,7 +54,7 @@
 
         <ImageButton
             android:id="@+id/submitWordButton"
-            android:src="@drawable/board_button_submit_up"
+            android:src="@drawable/board_button_submit"
             android:background="@android:color/transparent"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
 
         <ImageButton
             android:id="@+id/viewDictionaryButton"
-            android:src="@drawable/board_button_view_dictionary_up"
+            android:src="@drawable/board_button_view_dictionary"
             android:background="@android:color/transparent"
             android:layout_width="170dp"
             android:layout_height="wrap_content"
