@@ -6,6 +6,7 @@ package com.mortaramultimedia.wordwolfappandroid.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -13,8 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class BoardFragment extends Fragment {
 
 	private GameBoard gameBoardData;
 	private GridLayout gl;
-	private ArrayList<Button> buttons;
+	private ArrayList<ImageButton> letterButtons;
 	private ArrayList<ArrayList> buttonViews2d;
 	private int item;
 	private int rows;
@@ -120,7 +121,7 @@ public class BoardFragment extends Fragment {
 		printBoardData();
 		GameManager.init();
 
-		// DisplayMetrics method of getting nec width and height needed to size buttons
+		// DisplayMetrics method of getting nec width and height needed to size letterButtons
 		DisplayMetrics displayMetrics = new DisplayMetrics();
 		boardActivity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 		int dmWidth  = displayMetrics.widthPixels;
@@ -137,10 +138,10 @@ public class BoardFragment extends Fragment {
 
 
 
-		Button newButton;
-		buttons = new ArrayList<Button>();	//TODO - remove if unused
-		ArrayList<Button> buttonCol;
-		Character c = 'y';
+		ImageButton newButton;
+		letterButtons = new ArrayList<ImageButton>();	//TODO - remove if unused
+		ArrayList<ImageButton> buttonCol;
+		Character letter = 'y';
 		LinearLayout rowLayout;
 		String debugStr = "";
 
@@ -158,12 +159,12 @@ public class BoardFragment extends Fragment {
 
 		for(int row=0; row<this.rows; row++)
 		{
-			buttonCol = new ArrayList<Button>();
+			buttonCol = new ArrayList<ImageButton>();
 
 			//rowLayout = new LinearLayout( getActivity() );
 			for (int col=0; col<this.cols; col++)
 			{
-				c = Model.getGameBoard().getLetterAtPos(row, col); // get from data
+				letter = Model.getGameBoard().getLetterAtPos(row, col); // get from data
 
 				// optionally add some debug info onscreen
 				if ( Model.DEV_DEBUG_MODE )
@@ -171,16 +172,26 @@ public class BoardFragment extends Fragment {
 					debugStr = "\n" + " c" + col + " r" + row;
 				}
 
-				newButton = new Button( getActivity() );
-				TileData tagObj = new TileData( row, col, c, false );
+				String idStr = "@drawable/letter_button_" + letter.toString().toLowerCase();		// e.g. "letter_button_a"
+				//Log.d(TAG, "onCreateView: idStr: " + idStr);
+				int drawableID = getResources().getIdentifier(idStr, "drawable", getActivity().getPackageName());
+				//Log.d(TAG, "onCreateView: drawableID: " + drawableID);
+				Drawable buttonDrawable = getResources().getDrawable(drawableID);
+				//Log.d(TAG, "onCreateView: buttonDrawable: " + buttonDrawable);
+				newButton = new ImageButton(this.getActivity().getBaseContext());
+				//Log.d(TAG, "onCreateView: newButton: " + newButton);
+				newButton.setImageDrawable(buttonDrawable);
+
+				TileData tagObj = new TileData( row, col, letter, false );
+				Log.d(TAG, "onCreateView: tagObj: " + tagObj);
 
 				newButton.setTag(tagObj);
 				newButton.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth, buttonHeight));
-				newButton.setText(new String(c.toString() + debugStr));
-				newButton.setTextSize(buttonWidth / 4);
+				//newButton.setText(new String(c.toString() + debugStr));		//TODO: add debug text field on top of image?
+				//newButton.setTextSize(buttonWidth / 4);
 				newButton.setPadding(1, 1, 1, 1);
 				newButton.setOnClickListener(onLetterButtonClick);
-				buttons.add(newButton);
+				letterButtons.add(newButton);
 				buttonCol.add(newButton);
 				gl.addView( newButton );
 			}
@@ -188,7 +199,7 @@ public class BoardFragment extends Fragment {
 			buttonViews2d.add(buttonCol);
 		}
 
-		Log.d(TAG, "TEST BUTTON IS AT :::::::::::::::::: " + getButtonViewAtPosition(1, 3).getTag());
+		Log.d(TAG, "TEST BUTTON IS AT :::::::::::::::::: " + getButtonViewAtPosition(1, 3).getTag());	//TODO - remove
 
 		return gl;
 		//setContentView(gl);
@@ -197,14 +208,19 @@ public class BoardFragment extends Fragment {
 		// return inflater.inflate(R.layout.fragment_board, container, false);
 	}
 
-
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState)
+	{
+		Log.d(TAG, "onViewCreated");
+		resetAllTileViews();
+	}
 
 	//////////////////////////////////////////
 	// BOARD VIEW AND LETTER BUTTON VIEWS
 
-	public Button getButtonViewAtPosition(int row, int col)
+	public ImageButton getButtonViewAtPosition(int row, int col)
 	{
-		return (Button) buttonViews2d.get(row).get(col);
+		return (ImageButton) buttonViews2d.get(row).get(col);
 	}
 
 	/*private void createBoardData()
@@ -317,7 +333,7 @@ public class BoardFragment extends Fragment {
 			c = Model.getGameBoard().getLetterAtPos(td.getRow(), td.getCol());
 			Log.d(TAG, "onLetterButtonClick: " + td.toString() + ": " + c);
 
-			Button b = (Button) v;
+			ImageButton b = (ImageButton) v;
 			updateLetterButtonColor(b, td, "selected");
 
 			GameManager.processTileSelection(td);
@@ -331,12 +347,35 @@ public class BoardFragment extends Fragment {
 	 * @param td
 	 * @param type ("selected", "unselected")
 	 */
-	private void updateLetterButtonColor(Button button, TileData td, String type)
+	private void updateLetterButtonColor(ImageButton button, TileData td, String type)
 	{
-		//Log.d( TAG, "updateLetterButtonColor" );
+		Log.d( TAG, "updateLetterButtonColor: " + type);
 
 		if(Model.selectedTiles.size() == 0 || (Model.selectedTiles.size() > 0 && GameManager.isValidTileSelection(td)))
 		{
+			Log.d( TAG, "VALID TILE SELECTION" );
+
+			String idStr = null;
+			int drawableID = -1;
+			Drawable buttonDrawable = null;
+
+			if(type.equals("selected"))
+			{
+				idStr = "@drawable/letter_button_selected_" + ((Character) td.getLetter()).toString().toLowerCase();		// e.g. "letter_button_selected_a"
+//				button.setPressed(false);
+//				button.setSelected(true);
+			}
+			else if (type.equals("unselected"))
+			{
+				idStr = "@drawable/letter_button_up_" + ((Character) td.getLetter()).toString().toLowerCase();				// e.g. "letter_button_up_a"
+			}
+			drawableID = getResources().getIdentifier(idStr, "drawable", getActivity().getPackageName());
+			buttonDrawable = getResources().getDrawable(drawableID);
+//			button.setImageDrawable(buttonDrawable);
+			button.setBackground(buttonDrawable);
+
+			/*
+			// set state via color, rather than image
 			Log.d( TAG, "VALID TILE SELECTION" );
 			final int BG_COLOR_LIGHT = getResources().getColor(R.color.button_material_light);
 			final int BG_COLOR_DARK  = getResources().getColor(R.color.button_material_dark);
@@ -350,6 +389,7 @@ public class BoardFragment extends Fragment {
 				bgColor = BG_COLOR_LIGHT;
 			}
 			button.setBackgroundColor(bgColor);
+			*/
 		}
 	}
 
@@ -361,7 +401,7 @@ public class BoardFragment extends Fragment {
 		Log.d( TAG, "resetAllTileViews" );
 
 		TileData td;
-		Button button;
+		ImageButton button;
 		for (int row=0; row<this.rows; row++)
 		{
 			for (int col = 0; col < this.cols; col++)
