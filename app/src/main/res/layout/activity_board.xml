@@ -12,11 +12,14 @@
     <TextView
         android:id="@+id/dictionaryTitleText"
         android:text="Board. Let's Play!"
+        android:textSize="@dimen/abc_text_size_headline_material"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"/>
+        android:layout_marginTop="10dp"
+        android:paddingBottom="5dp"
+        />
 
     <fragment
         android:id="@+id/boardFragment"
@@ -26,25 +29,43 @@
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         android:layout_centerVertical="true"
-        android:layout_weight="1"
+        android:layout_weight="0.67"
         tools:layout="@layout/fragment_board"
         />
 
     <TextView
         android:id="@+id/wordSoFarText"
-        android:text="Your Word: "
+        android:text="@string/word_so_far"
+        android:textSize="@dimen/abc_text_size_headline_material"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
         />
 
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        >
 
-        <Button
+
+
+        <ImageButton
+            android:id="@+id/submitWordButton"
+            android:src="@drawable/board_button_submit_up"
+            android:background="@android:color/transparent"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="handleSubmitWordButtonClick"
+            />
+
+        <!--Button
             android:id="@+id/submitWord"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
@@ -53,19 +74,48 @@
             android:layout_marginBottom="10dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:onClick="handleSubmitButtonClick"
-            />
+            android:onClick="handleSubmitWordButtonClick"
+            /-->
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
 
         <TextView
-            android:id="@+id/scoreText"
-            android:text="Score: "
-            android:layout_width="80dp"
+            android:text="Score:"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             />
 
-        <Button
+        <TextView
+            android:id="@+id/scoreText"
+            android:text="0"
+            android:textSize="@dimen/abc_text_size_headline_material"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            />
+
+    </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/viewDictionaryButton"
+            android:src="@drawable/board_button_view_dictionary_up"
+            android:background="@android:color/transparent"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="handleViewDictionaryButtonClick"
+            />
+
+        <!--Button
             android:id="@+id/viewDictionaryButton"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
@@ -73,10 +123,9 @@
             android:textSize="14dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:onClick="handleDictionaryButtonClick"
-            />
+            android:onClick="handleViewDictionaryButtonClick"
+            /-->
+
 
     </LinearLayout>
-
-
-</LinearLayout >
+</LinearLayout>

@@ -12,11 +12,12 @@
     <TextView
         android:id="@+id/welcomeText"
         android:text="@string/title_welcome"
+        android:textSize="@dimen/abc_text_size_headline_material"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="10dp"
         />
 
     <TextView
@@ -27,9 +28,20 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="61dp"
+        android:layout_marginBottom="20dp"
         />
 
-    <Button
+    <ImageButton
+        android:id="@+id/startButton"
+        android:src="@drawable/main_start_button_up"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="handleStartButtonClick"
+        android:layout_marginBottom="200dp"
+        />
+
+    <!--Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="START"
@@ -38,9 +50,18 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="55dp"
         android:onClick="handleStartButtonClick"
+        /-->
+
+    <ImageButton
+        android:id="@+id/debugButton"
+        android:src="@drawable/main_button_debug_up"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="handleDebugButtonClick"
         />
 
-    <Button
+    <!--Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="DEBUG"
@@ -49,7 +70,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="220dp"
         android:onClick="handleDebugButtonClick"
-        />
+        /-->
 
 
 </LinearLayout>

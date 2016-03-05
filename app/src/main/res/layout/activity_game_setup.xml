@@ -24,8 +24,9 @@
 			android:id="@+id/titleText"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:text="Game Setup"
-			android:textSize="30sp"
+			android:layout_marginTop="10dp"
+			android:text="@string/game_setup"
+			android:textSize="@dimen/abc_text_size_headline_material"
 			/>
 
 	</LinearLayout>
@@ -62,7 +63,21 @@
 			/>
 	</LinearLayout>
 
-	<Button
+	<ImageButton
+		android:id="@+id/playButton"
+		android:src="@drawable/game_setup_button_play_up"
+		android:background="@android:color/transparent"
+		android:layout_width="100dp"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="10dp"
+		android:layout_marginRight="0dp"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="50dp"
+		android:onClick="handlePlayButtonClick"
+		/>
+
+	<!--Button
 		android:id="@+id/playButton"
 		android:text="Play!"
 		android:layout_width="150dp"
@@ -70,7 +85,7 @@
 		android:onClick="handlePlayButtonClick"
 		android:textSize="30sp"
 		android:layout_marginTop="40dp"
-		/>
+		/-->
 
 </LinearLayout>
 

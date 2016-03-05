@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.constants.Constants;
@@ -41,7 +42,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	private TextView opponentUsernameText;
 
 	// login button
-	private Button loginButton;
+	private ImageButton loginButton;
 
 	// input text and related refs
 	private TextView inputText;
@@ -49,7 +50,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	private Button clearInputButton;
 
 	// game prep buttons
-	private Button chooseOpponentButton;
+	private ImageButton chooseOpponentButton;
 
 
 	@Override
@@ -67,6 +68,14 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		Comm.connectToServer();
 	}
 
+	@Override
+	protected void onResume()
+	{
+		Log.d(TAG, "onResume");
+		super.onResume();
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+	}
+
 	/**
 	 * Create the needed references to buttons and UI elements.
 	 */
@@ -74,18 +83,18 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	{
 		connectedToServerCheckBox 		= (CheckBox) 	findViewById(R.id.connectedToServerCheckBox);
 		connectedToDatabaseCheckBox 	= (CheckBox) 	findViewById(R.id.connectedToDatabaseCheckBox);
-		loggedInCheckBox 					= (CheckBox)	findViewById(R.id.loggedInCheckBox);
+		loggedInCheckBox 				= (CheckBox)	findViewById(R.id.loggedInCheckBox);
 
-		usernameText 						= (TextView) 	findViewById(R.id.usernameText);
+		usernameText 					= (TextView) 	findViewById(R.id.usernameText);
 		opponentUsernameText 			= (TextView) 	findViewById(R.id.opponentUsernameText);
 
-		loginButton 						= (Button)  	findViewById(R.id.loginButton);
+		loginButton 					= (ImageButton) findViewById(R.id.loginButton);
 
-		inputText 							= (EditText)	findViewById(R.id.inputText);
+		inputText 						= (EditText)	findViewById(R.id.inputText);
 		hideKeyboardButton 				= (Button)		findViewById(R.id.hideKeyboardButton);
-		clearInputButton 					= (Button)		findViewById(R.id.clearInputButton);
+		clearInputButton 				= (Button)		findViewById(R.id.clearInputButton);
 
-		chooseOpponentButton 			= (Button)		findViewById(R.id.chooseOpponentButton);
+		chooseOpponentButton 			= (ImageButton)	findViewById(R.id.chooseOpponentButton);
 	}
 
 	/**

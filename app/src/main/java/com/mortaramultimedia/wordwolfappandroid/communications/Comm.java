@@ -138,7 +138,7 @@ public class Comm
 	 */
 	public static void handleIncomingObject(Object obj)
 	{
-		Log.d(TAG, "handleIncomingObject: **************************** " + obj);
+		Log.d(TAG, "handleIncomingObject: " + obj);
 		if(currentActivity != null)
 		{
 			currentActivity.handleIncomingObject(obj);
@@ -147,7 +147,7 @@ public class Comm
 
 	public static void handleProgressUpdate(Object obj)
 	{
-		Log.d(TAG, "handleProgressUpdate: **************************** " + obj);
+		Log.d(TAG, "handleProgressUpdate: " + obj);
 		if(currentActivity != null && obj != null)
 		{
 			Log.d(TAG, "handleProgressUpdate: forwarding object to currentActivity: " + currentActivity.toString());

@@ -21,6 +21,7 @@ import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
 import com.mortaramultimedia.wordwolfappandroid.DictionaryActivity;
 import com.mortaramultimedia.wordwolfappandroid.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
+import com.mysql.jdbc.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -69,8 +70,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	private void setupBoard()
 	{
 		Log.d(TAG, "setupBoard");
-		wordSoFarText = (TextView) findViewById(R.id.wordSoFarText);
-		scoreText = (TextView) findViewById(R.id.scoreText);
+		wordSoFarText 	= (TextView) findViewById(R.id.wordSoFarText);
+		scoreText 		= (TextView) findViewById(R.id.scoreText);
 	}
 
 
@@ -128,12 +129,15 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	public void updateScoreDisplay()
 	{
 		Log.d(TAG, "updateScoreDisplay");
-		scoreText.setText(getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size());
+		Integer newScore = Integer.valueOf(Model.validWordsThisGame.size());
+		String newScoreStr = newScore.toString();
+		scoreText.setText(newScoreStr);
+//		scoreText.setText(getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size());
 	}
 
-	public void handleSubmitButtonClick(View view)
+	public void handleSubmitWordButtonClick(View view)
 	{
-		Log.d(TAG, "handleSubmitButtonClick");
+		Log.d(TAG, "handleSubmitWordButtonClick");
 
 		// submit the word for comparison with dictionary and increment score if nec
 		Boolean wordIsValid = GameManager.checkWordValidity();
@@ -159,9 +163,9 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		updateScoreDisplay();
 	}
 
-	public void handleDictionaryButtonClick(View view)
+	public void handleViewDictionaryButtonClick(View view)
 	{
-		Log.d(TAG, "handleDictionaryButtonClick");
+		Log.d(TAG, "handleViewDictionaryButtonClick");
 
 		Intent dictionaryIntent = new Intent(this, DictionaryActivity.class);
 		startActivity(dictionaryIntent);

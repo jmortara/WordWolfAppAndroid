@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
@@ -47,13 +48,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	LoginAsyncTask loginTask;
 
 	// UI references.
-	private View mLoginFormView;						// main form
-	private AutoCompleteTextView mUsernameView;	// username text field
+	private View mLoginFormView;					// main form
+	private AutoCompleteTextView mUsernameView;		// username text field
 	private AutoCompleteTextView mEmailView;		// email text field
 	private EditText mPasswordView;					// password text field
-	private Button mSetUserToTest1View;				// sign in / register button
-	private Button mSetUserToTest2View;				// set user to test1 button
-	private Button mSignInView;						// set user to test2
+	private ImageButton mSignInView;				// login button
+	private ImageButton mCreateNewAccountView;		// create new account button
+	private ImageButton mSetUserToTest1View;		// set user to test1 button
+	private ImageButton mSetUserToTest2View;		// set user to test2 button
 	private View mProgressView;						// login progress bar/wheel
 
 	@Override
@@ -70,17 +72,35 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		Log.d(TAG, "onCreate found an intent testParam of: " + testValue);
 
 		// assign UI references
-		mLoginFormView 		= (View) 						findViewById(R.id.login_form);
+		mLoginFormView 			= (View) 					findViewById(R.id.login_form);
 		mUsernameView 			= (AutoCompleteTextView) 	findViewById(R.id.username);
 		mEmailView 				= (AutoCompleteTextView) 	findViewById(R.id.email);
-		mPasswordView 			= (EditText) 					findViewById(R.id.password);
-		mSetUserToTest1View 	= (Button) 						findViewById(R.id.setUserToTest1_button);
-		mSetUserToTest2View	= (Button) 						findViewById(R.id.setUserToTest2_button);
-		mSignInView 			= (Button) 						findViewById(R.id.account_sign_in_or_register_button);
-		mProgressView 			= (View) 						findViewById(R.id.login_progress);
+		mPasswordView 			= (EditText) 				findViewById(R.id.password);
+		mSignInView 			= (ImageButton) 			findViewById(R.id.account_log_in_button);
+		mCreateNewAccountView	= (ImageButton) 			findViewById(R.id.create_new_account_button);
+		mSetUserToTest1View 	= (ImageButton) 			findViewById(R.id.setUserToTest1_button);
+		mSetUserToTest2View		= (ImageButton) 			findViewById(R.id.setUserToTest2_button);
+		mProgressView 			= (View) 					findViewById(R.id.login_progress);
 
 		// set default values in text fields to expedite testing - TODO: remove
 		setDefaults();
+
+		// assign Log In behavior
+		mSignInView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.d(TAG, "mSignInView clicked");
+				attemptLogin();
+			}
+		});
+
+		// assign Log In behavior
+		mCreateNewAccountView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.w(TAG, "mCreateNewAccountView clicked: behavior TBD");
+			}
+		});
 
 		// assign test user 1 behavior
 		mSetUserToTest1View.setOnClickListener(new OnClickListener()
@@ -104,16 +124,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 			}
 		});
 
-		// assign Sign In / Register button behavior
-		mSignInView.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				Log.d(TAG, "mSignInView clicked");
-				attemptLogin();
-			}
-		});
 	}
 
 	/**
@@ -389,7 +399,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	@Override
 	public void handleIncomingObject(Object obj)
 	{
-		Log.d(TAG, "handleIncomingObject, behavior TBD... " + obj);
+		Log.w(TAG, "handleIncomingObject, no cases accounted for, behavior TBD... " + obj);
 	}
 
 

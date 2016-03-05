@@ -18,7 +18,6 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
 import com.mortaramultimedia.wordwolf.shared.messages.TileData;
@@ -139,7 +138,7 @@ public class BoardFragment extends Fragment {
 
 
 		Button newButton;
-		buttons = new ArrayList<Button>();
+		buttons = new ArrayList<Button>();	//TODO - remove if unused
 		ArrayList<Button> buttonCol;
 		Character c = 'y';
 		LinearLayout rowLayout;

@@ -12,7 +12,7 @@
     <string name="title_activity_login">Login</string>
     <string name="title_activity_game">Game</string>
     <string name="title_activity_board">BoardActivity</string>
-    <string name="word_so_far">Your Word:</string>
+    <string name="word_so_far">> </string>
     <string name="score">Score:</string>
     <string name="title_activity_dictionary">DictionaryActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -91,9 +91,13 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_fake">FakeActivity</string>
     <string name="title_activity_connections">ConnectionsActivity</string>
+    <string name="log_in">Log In</string>
     <string name="choose_opponent">Choose Opponent</string>
     <string name="input_text_hint">Input text for behavior below.</string>
     <string name="click_to_enter_text">Click to enter text.</string>
     <string name="choose_an_opponent">Choose an Opponent</string>
+    <string name="game_over">Game Over. Play again?</string>
+    <string name="game_setting">Game Settings</string>
+    <string name="game_setup">Game Setup</string>
     <string name="title_activity_game_over">GameOverActivity</string>
 </resources>

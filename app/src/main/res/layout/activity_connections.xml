@@ -18,7 +18,7 @@
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="60dp">
+		android:layout_height="50dp">
 
 		<CheckBox
 			android:id="@+id/connectedToServerCheckBox"
@@ -69,7 +69,7 @@
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="30dp">
+		android:layout_height="40dp">
 		<TextView
 			android:id="@+id/user"
 			android:text="User:"
@@ -102,13 +102,22 @@
 			/>
 	</LinearLayout>
 
-	<Button
+	<ImageButton
+		android:id="@+id/loginButton"
+		android:src="@drawable/connections_button_log_in_up"
+		android:background="@android:color/transparent"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:onClick="handleLoginButtonClick"
+		/>
+
+	<!--Button
 		android:id="@+id/loginButton"
 		android:text="Log In"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:onClick="handleLoginButtonClick"
-		/>
+		/-->
 
 	<Space
 		android:layout_width="match_parent"
@@ -117,13 +126,22 @@
 		/>
 
 
-	<Button
+	<ImageButton
+		android:id="@+id/chooseOpponentButton"
+		android:src="@drawable/connections_button_choose_opponent_up"
+		android:background="@android:color/transparent"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:onClick="handleChooseOpponentButtonClick"
+		/>
+
+	<!--Button
 		android:id="@+id/chooseOpponentButton"
 		android:text="@string/choose_opponent"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:onClick="handleChooseOpponentButtonClick"
-		/>
+		/-->
 
 	<Space
 		android:layout_width="match_parent"
@@ -131,7 +149,7 @@
 		android:layout_weight="0.6"
 		/>
 
-	<TextView
+	<!--TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAppearance="?android:attr/textAppearanceMedium"
@@ -146,9 +164,9 @@
 		android:layout_height="wrap_content"
 		android:minHeight="50dp"
 		android:onClick="handleInputTextClick"
-		/>
+		/-->
 
-	<LinearLayout
+	<!--LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -169,7 +187,7 @@
 			android:layout_height="wrap_content"
 			android:onClick="handleClearInputTextButtonClick"
 			/>
-	</LinearLayout>
+	</LinearLayout-->
 
 </LinearLayout>
 

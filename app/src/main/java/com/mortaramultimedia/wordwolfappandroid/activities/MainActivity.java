@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
@@ -30,7 +31,7 @@ public class MainActivity extends Activity {
 
 	public static final String TAG = "MainActivity";
 	private TextView statusText;
-	private Button startButton;
+	private ImageButton startButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +45,8 @@ public class MainActivity extends Activity {
 	{
 		Log.d(TAG, "init");
 
-		statusText = (TextView) findViewById(R.id.statusText);
-		startButton = (Button) findViewById(R.id.startButton);
+		statusText 	= (TextView) 	findViewById(R.id.statusText);
+		startButton = (ImageButton) findViewById(R.id.startButton);
 
 		statusText.setText(getResources().getString(R.string.startup));
 //		setStartButtonVisibility(View.INVISIBLE);

@@ -462,7 +462,7 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 	 */
 	private void publishObject(Object obj)
 	{
-		Log.d(TAG, "publishObject ************");
+		Log.d(TAG, "publishObject: " + obj);
 		if (obj != null)
 		{
 			Model.setIncomingObj(obj);

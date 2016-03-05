@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
@@ -26,7 +26,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 
 	TextView usernameText;
 	TextView opponentUsernameText;
-	Button playButton;
+	ImageButton playButton;
 
 
 	@Override
@@ -59,7 +59,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Log.d(TAG, "createUIReferences");
 		usernameText 					= (TextView) 	findViewById(R.id.usernameText);
 		opponentUsernameText 			= (TextView) 	findViewById(R.id.opponentUsernameText);
-		playButton 						= (Button) 		findViewById(R.id.playButton);
+		playButton 						= (ImageButton) findViewById(R.id.playButton);
 	}
 
 	/**

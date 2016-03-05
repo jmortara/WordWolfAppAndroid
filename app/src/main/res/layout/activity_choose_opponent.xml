@@ -14,8 +14,9 @@
 
 		<TextView android:layout_width="match_parent"
 			  android:layout_height="wrap_content"
+				  android:layout_marginTop="10dp"
 			  android:text="@string/choose_an_opponent"
-			  android:textSize="24sp"
+				android:textSize="@dimen/abc_text_size_headline_material"
 			  android:layout_weight=".1"
 			  />
 

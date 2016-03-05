@@ -10,6 +10,14 @@
 			  android:paddingTop="@dimen/activity_vertical_margin"
 			  tools:context="com.mortaramultimedia.deployedservertest.activities.LoginActivity">
 
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="10dp"
+		android:text="@string/log_in"
+		android:textSize="@dimen/abc_text_size_headline_material"
+		/>
+
 	<!-- Login progress -->
 	<ProgressBar
 		android:id="@+id/login_progress"
@@ -60,7 +68,56 @@
 				android:maxLines="1"
 				android:singleLine="true"/>
 
-			<Button
+
+			<ImageButton
+				android:id="@+id/account_log_in_button"
+				android:src="@drawable/login_button_log_in_up"
+				android:background="@android:color/transparent"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="24dp"
+				android:layout_marginBottom="24dp"
+				android:layout_alignParentBottom="true"
+				android:layout_centerHorizontal="true"
+				/>
+
+			<ImageButton
+				android:id="@+id/create_new_account_button"
+				android:src="@drawable/login_button_create_new_account_up"
+				android:background="@android:color/transparent"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="4dp"
+				android:layout_alignParentBottom="true"
+				android:layout_centerHorizontal="true"
+				/>
+
+			<ImageButton
+				android:id="@+id/setUserToTest1_button"
+				android:src="@drawable/login_button_set_user_test1_up"
+				android:background="@android:color/transparent"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="4dp"
+				android:layout_alignParentBottom="true"
+				android:layout_centerHorizontal="true"
+				/>
+
+			<ImageButton
+				android:id="@+id/setUserToTest2_button"
+				android:src="@drawable/login_button_set_user_test2_up"
+				android:background="@android:color/transparent"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="10dp"
+				android:layout_alignParentBottom="true"
+				android:layout_centerHorizontal="true"
+				/>
+
+			<!--Button
 				android:id="@+id/account_sign_in_or_register_button"
 				style="?android:textAppearanceSmall"
 				android:layout_width="match_parent"
@@ -85,7 +142,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="4dp"
 				android:text="@string/action_set_user_to_test_2"
-				android:textStyle="bold"/>
+				android:textStyle="bold"/-->
 
 		</LinearLayout>
 	</ScrollView>
