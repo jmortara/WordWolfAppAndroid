@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
-import com.mortaramultimedia.wordwolfappandroid.GameManager;
+import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;

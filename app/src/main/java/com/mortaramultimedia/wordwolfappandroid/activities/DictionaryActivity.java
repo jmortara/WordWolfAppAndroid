@@ -1,10 +1,12 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.mortaramultimedia.wordwolfappandroid.R;
 
 public class DictionaryActivity extends Activity {
 

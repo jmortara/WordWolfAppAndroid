@@ -32,7 +32,7 @@
                 android:value=".activities.MainActivity"/>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".unused.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activities.MainActivity">
             <meta-data
@@ -46,13 +46,13 @@
         <activity
             android:name=".activities.BoardActivity"
             android:label="@string/title_activity_board"
-            android:parentActivityName=".SettingsActivity">
+            android:parentActivityName=".unused.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.mortaramultimedia.wordwolfappandroid.SettingsActivity"/>
+                android:value=".unused.SettingsActivity"/>
         </activity>
         <activity
-            android:name=".DictionaryActivity"
+            android:name=".activities.DictionaryActivity"
             android:label="@string/title_activity_dictionary"
             android:parentActivityName=".activities.BoardActivity">
             <meta-data

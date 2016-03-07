@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.unused;
 
 
 import android.annotation.TargetApi;
@@ -19,6 +19,8 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+
+import com.mortaramultimedia.wordwolfappandroid.R;
 
 import java.util.List;
 

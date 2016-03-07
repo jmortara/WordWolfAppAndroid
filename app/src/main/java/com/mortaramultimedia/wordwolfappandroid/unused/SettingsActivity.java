@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.unused;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 

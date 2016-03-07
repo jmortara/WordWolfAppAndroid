@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.game;
 
 import android.app.Activity;
 import android.util.Log;

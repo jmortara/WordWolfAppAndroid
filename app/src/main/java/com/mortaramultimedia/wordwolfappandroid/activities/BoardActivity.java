@@ -18,13 +18,10 @@ import com.mortaramultimedia.wordwolf.shared.messages.TileData;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
-import com.mortaramultimedia.wordwolfappandroid.DictionaryActivity;
-import com.mortaramultimedia.wordwolfappandroid.GameManager;
+import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
-import com.mysql.jdbc.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Timer;
 
 /**
  * Created by Jason Mortara on 11/15/14.

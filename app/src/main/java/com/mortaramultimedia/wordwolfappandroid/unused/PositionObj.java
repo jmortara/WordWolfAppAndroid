@@ -1,4 +1,4 @@
-package com.mortaramultimedia.wordwolfappandroid;
+package com.mortaramultimedia.wordwolfappandroid.unused;
 
 public class PositionObj {
 	public int col = -1;

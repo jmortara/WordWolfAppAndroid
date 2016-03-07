@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import com.mortaramultimedia.wordwolf.shared.messages.GameBoard;
 import com.mortaramultimedia.wordwolf.shared.messages.TileData;
 
-import com.mortaramultimedia.wordwolfappandroid.GameManager;
-import com.mortaramultimedia.wordwolfappandroid.R;
+import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 
