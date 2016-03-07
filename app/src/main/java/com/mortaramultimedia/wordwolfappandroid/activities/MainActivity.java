@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
 
 		statusText.setText(getResources().getString(R.string.startup));
 //		setStartButtonVisibility(View.INVISIBLE);
-		populateDictionary();	//TODO - move to game
+		populateDictionary();	//TODO - move to game or setup, if this seems to increase startup time
 
 	}
 

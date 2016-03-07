@@ -32,6 +32,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	private static final String TAG = "BoardActivity";
 	private TextView wordSoFarText;
 	private TextView scoreText;
+	BoardFragment boardFragment = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +155,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 
 		// reset the word and the word display
 		GameManager.startNewWord();
-		BoardFragment boardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.boardFragment);	//TODO: make class var
+		boardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.boardFragment);
 		boardFragment.resetAllTileViews();
 		updateWordDisplay();
 		updateScoreDisplay();

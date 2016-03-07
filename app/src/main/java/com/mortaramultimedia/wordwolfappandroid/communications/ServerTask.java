@@ -23,7 +23,7 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 {
 	public static final String TAG = "ServerTask";
 
-//	private Activity referenceActivity;
+//	private Activity referenceActivity;		//TODO - remove? this stored Activity reference is handled by Comm now.
 	private Socket s;
 	private ObjectOutputStream s_objOut;
 	private ObjectInputStream s_objIn;
@@ -163,7 +163,6 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 						{
 							Log.d(TAG, "Server response obj: " + responseObj);
 							//Model.setIncomingMessageObj(responseObj);
-							//TODO: FILL IN RESPONSE HANDLING
 							handleIncomingObject(responseObj);
 						}
 					}
@@ -471,7 +470,7 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 
 		/*if(referenceActivity != null)
 		{
-			//TODO - remove?
+
 		}*/
 
 	}

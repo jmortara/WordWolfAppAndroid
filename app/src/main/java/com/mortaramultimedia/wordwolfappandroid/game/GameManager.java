@@ -146,10 +146,6 @@ public class GameManager
 		Boolean isValid = false;
 		String submittedWord = getWordSoFar().toLowerCase();
 
-		//TODO: TEMPORARY!!!!!!!!!! LOAD REAL DICTIONARY!!!!!!!!!!!!!!!
-		//isValid = true;	// all words are valid!!!!!!!!!!!
-
-		//TODO: check dictionary
 		if ( submittedWord.length() == 0 )
 		{
 			Log.w( TAG, "checkWordValidity: word string is empty" );

@@ -82,7 +82,6 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d(TAG, "showGameOverDialog: dialog button pressed: positive");
-                //TODO: start new game without starting a new Activity
 
                 // send out a post-endgame request specifying a rematch
                 //TODO - why not just use the existing GetOpponentRequest?

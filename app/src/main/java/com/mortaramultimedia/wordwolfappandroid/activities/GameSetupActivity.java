@@ -81,8 +81,8 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	public void handlePlayButtonClick(View view) throws IOException
 	{
 		Log.d(TAG, "handlePlayButtonClick: sending create game request, server will need to hear same from opponent to start game...");
-		int rows = 5;   //TODO allow player selection of grid size
-		int cols = 5;   //TODO allow player selection of grid size
+		int rows = 5;   //TODO allow player selection of grid size, e.g. via SettingsActivity menu
+		int cols = 5;
 		CreateGameRequest request = new CreateGameRequest(-1, Model.getUserLogin().getUserName(), "defaultGameType", rows, cols, false, -1, -1, Model.getOpponentUsername(), 9000);
 		Comm.sendObject(request);
 	}

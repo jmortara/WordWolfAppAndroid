@@ -7,11 +7,19 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".activities.BoardActivity">
+    android:background="@color/LightBlue"
+    tools:context=".activities.BoardActivity"
+    >
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
 
     <TextView
         android:id="@+id/dictionaryTitleText"
-        android:text="Board. Let's Play!"
+        android:text="Game On!"
         android:textSize="@dimen/abc_text_size_headline_material"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,19 +27,55 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:paddingBottom="5dp"
+        android:paddingRight="10dp"
         />
 
-    <fragment
-        android:id="@+id/boardFragment"
-        android:name="com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:layout_weight="0.67"
-        tools:layout="@layout/fragment_board"
-        />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            >
+
+            <TextView
+                android:text="Score:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:maxLines="1"
+                android:paddingTop="5dp"
+                />
+
+            <TextView
+                android:id="@+id/scoreText"
+                android:text="0"
+                android:textSize="@dimen/abc_text_size_headline_material"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/viewDictionaryButton"
+            android:src="@drawable/board_button_view_dictionary"
+            android:background="@android:color/transparent"
+            android:layout_width="140dp"
+            android:layout_height="45dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:scaleType="centerInside"
+            android:paddingRight="10dp"
+            android:onClick="handleViewDictionaryButtonClick"
+            />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/wordSoFarText"
@@ -44,24 +88,39 @@
         android:layout_marginBottom="5dp"
         />
 
+
+    <fragment
+        android:id="@+id/boardFragment"
+        android:name="com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_weight="0.67"
+        android:background="@color/black"
+        tools:layout="@layout/fragment_board"
+        />
+
+
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/wordwolf_button_color_blue_up"
         >
-
-
 
         <ImageButton
             android:id="@+id/submitWordButton"
             android:src="@drawable/board_button_submit"
-            android:background="@android:color/transparent"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="0dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:background="@color/wordwolf_button_color_blue_up"
             android:onClick="handleSubmitWordButtonClick"
             />
 
@@ -76,44 +135,6 @@
             android:layout_centerHorizontal="true"
             android:onClick="handleSubmitWordButtonClick"
             /-->
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        >
-
-        <TextView
-            android:text="Score:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            />
-
-        <TextView
-            android:id="@+id/scoreText"
-            android:text="0"
-            android:textSize="@dimen/abc_text_size_headline_material"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            />
-
-    </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/viewDictionaryButton"
-            android:src="@drawable/board_button_view_dictionary"
-            android:background="@android:color/transparent"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:onClick="handleViewDictionaryButtonClick"
-            />
 
         <!--Button
             android:id="@+id/viewDictionaryButton"

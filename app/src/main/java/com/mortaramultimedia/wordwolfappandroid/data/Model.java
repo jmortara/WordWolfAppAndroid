@@ -8,7 +8,7 @@ import java.util.Properties;
 
 
 /**
- * Created by Jason Mortara on 11/26/2014.
+ * Created by Jason Mortara on 11/26/2014.	//TODO: add client states?
  */
 public class Model
 {

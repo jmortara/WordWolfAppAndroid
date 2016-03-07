@@ -67,7 +67,8 @@ public class BoardFragment extends Fragment {
 	 * @return A new instance of fragment BoardFragment.
 	 */
 	// TODO: Rename and change types and number of parameters
-	public static BoardFragment newInstance(String param1, String param2) {
+	public static BoardFragment newInstance(String param1, String param2)
+	{
 		BoardFragment fragment = new BoardFragment();
 		Bundle args = new Bundle();
 		args.putString(ARG_PARAM1, param1);
@@ -75,6 +76,7 @@ public class BoardFragment extends Fragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
+
 	public BoardFragment() {
 		// Required empty public constructor
 	}
