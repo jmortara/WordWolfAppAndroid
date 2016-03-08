@@ -644,19 +644,20 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 				Debug.waitForDebugger();
 			}
 
+			String host = Model.getHostIP();
 			s = new Socket();
 
 			try
 			{
-				Log.d(TAG, "Attempting to connect to " + Model.HOST + " " + Model.PORT);
+				Log.d(TAG, "Attempting to connect to " + host + " " + Model.PORT);
 				try
 				{
-					s.connect(new InetSocketAddress(Model.HOST, Model.PORT));
+					s.connect(new InetSocketAddress(host, Model.PORT));
 				}
 				//Host not found
 				catch (UnknownHostException e)
 				{
-					System.err.println("Don't know about host : " + Model.HOST);
+					System.err.println("Don't know about host : " + host);
 //					System.exit(1);	// exit app
 					try
 					{
@@ -899,6 +900,13 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 			{
 				handleEndGameResponse(((EndGameResponse) obj));
 			}
+			/**
+			 * If receiving a PostEndGameActionResponse, which might for example contain an accept or decline of a rematch
+			 */
+			else if (obj instanceof PostEndGameActionResponse)
+			{
+				handlePostEndGameActionResponse(((PostEndGameActionResponse) obj));
+			}
 
 		}
 
@@ -1047,6 +1055,12 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 
 			//TODO: note that one EndGameRequest send to the server results in one EndGameResponse going to each matched player, so each will receive 2 EndGames.
 			Log.d(TAG, "handleEndGameResponse: *****GAME OVER!***** final score according to server: " + response.getFinalScoreFromServer());
+		}
+
+		private void handlePostEndGameActionResponse(PostEndGameActionResponse response)
+		{
+			Log.d(TAG, "handlePostEndGameActionResponse: " + response);
+			publishObject(response);
 		}
 
 		private void logGameBoard(GameBoard gameBoard)

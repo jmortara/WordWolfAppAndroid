@@ -20,12 +20,22 @@
 			android:layout_marginTop="10dp"
 			android:text="@string/choose_an_opponent"
 			android:textSize="@dimen/abc_text_size_headline_material"
-			android:layout_weight=".1"
-			  />
+			android:layout_weight=".05"
+			android:paddingBottom="10dp"
+			/>
+
+		<Button
+			android:id="@+id/refreshOpponentsListButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Refresh"
+			android:layout_weight=".05"
+			android:onClick="handleRefreshOpponentsListButtonClick"
+			/>
 
 		<ListView
 			  android:id="@+id/opponentsListView"
-			  android:layout_marginTop="40dp"
+			  android:layout_marginTop="10dp"
 			  android:layout_marginBottom="10dp"
 			  android:layout_width="wrap_content"
 			  android:layout_height="wrap_content"

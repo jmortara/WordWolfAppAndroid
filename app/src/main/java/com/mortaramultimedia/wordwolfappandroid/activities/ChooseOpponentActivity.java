@@ -1,7 +1,9 @@
 package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -28,6 +31,9 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	// UI refs
 	private ListView opponentsListView;
 	private ArrayAdapter<String> playersAdapter;
+
+	// dialog
+	private AlertDialog selectOpponentRequestDialog = null;
 
 
 	@Override
@@ -68,11 +74,9 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		Log.d(TAG, "createUIListeners");
 
 		// Opponents List item click listener
-		opponentsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-		{
+		opponentsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				final String opponentName = (String) parent.getItemAtPosition(position);
 				Log.d(TAG, "Opponent List Item Click Listener: opponent list item clicked: " + opponentName);
 				SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentName);
@@ -87,6 +91,12 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	private void updateUI()
 	{
 		Log.d(TAG, "updateUI");
+	}
+
+	public void handleRefreshOpponentsListButtonClick(View view) throws IOException
+	{
+		Log.d(TAG, "handleRefreshOpponentsListButtonClick");
+		requestPlayerList();
 	}
 
 	/**
@@ -125,11 +135,29 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		else if (obj instanceof GetPlayerListResponse)
 		{
 			ArrayList<String> players = (((GetPlayerListResponse) obj).getPlayersCopy());
-			if(players != null && players.size() > 0)
+			if(players != null)
 			{
-				Log.d(TAG, "handleIncomingObject: players list: " + players);
-				playersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, players);
-				opponentsListView.setAdapter(playersAdapter);
+				if (players.size() > 0)
+				{
+					Log.d(TAG, "handleIncomingObject: players list: " + players);
+					playersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, players);
+					opponentsListView.setAdapter(playersAdapter);
+				}
+				else if (players.size() == 0)
+				{
+					Log.w(TAG, "handleIncomingObject: WARNING: empty players list. UI may show no avail opponents.");
+				}
+			}
+			else
+			{
+				Log.w(TAG, "handleIncomingObject: WARNING: null players list. UI may show no avail opponents.");
+			}
+		}
+		else if (obj instanceof SelectOpponentRequest)
+		{
+			if (((SelectOpponentRequest) obj).getDestinationUserName().equals(Model.getUserLogin().getUserName()))
+			{
+				showSelectOpponentRequestDialog((SelectOpponentRequest) obj);
 			}
 		}
 		else if (obj instanceof SelectOpponentResponse)
@@ -155,6 +183,43 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
 		}
+	}
+
+	private void showSelectOpponentRequestDialog(SelectOpponentRequest request)
+	{
+		Log.d(TAG, "showSelectOpponentRequestDialog");
+
+		final String sourceUsername = request.getSourceUsername();
+		selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
+		selectOpponentRequestDialog.setTitle("Opponent Request");
+		selectOpponentRequestDialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
+
+		// set up and listener for Accept button
+		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
+//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
+//				String sourceUsername = request.getSourceUsername();
+				Model.setOpponentUsername(sourceUsername);
+				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername);
+				Comm.sendObject(response);
+			}
+		});
+
+		// set up and listener for Decline button
+		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
+//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
+//				String sourceUsername = request.getSourceUsername();
+				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername);
+				Comm.sendObject(response);
+			}
+		});
+
+		selectOpponentRequestDialog.show();
 	}
 
 	private void handleSelectOpponentResponse(SelectOpponentResponse response)

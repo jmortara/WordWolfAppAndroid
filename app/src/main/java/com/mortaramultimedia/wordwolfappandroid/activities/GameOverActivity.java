@@ -20,6 +20,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
 {
     private static final String TAG = "GameOverActivity";
     private AlertDialog gameOverDialog = null;
+    private AlertDialog selectOpponentRequestDialog = null;
 
 
     @Override
@@ -89,6 +90,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
                         2, Model.getOpponentUsername(), "game_type_rematch", true, Model.getGameBoard().getRows(), Model.getGameBoard().getCols(),
                         Model.getGameDurationMS());
                 Comm.sendObject(rematchRequest);
+                //TODO - show test or toast saying "Waiting for Opponent to respond..."
             }
         });
 
@@ -99,10 +101,10 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
                 Log.d(TAG, "showGameOverDialog: dialog button pressed: negative");
                 dialog.dismiss();
 
-                // send out a post-endgame request specifying a rematch
-//                final PostEndGameActionRequest chooseNewOpponentRequest = new PostEndGameActionRequest(1, Model.getUserLogin().getUserName(),
-//                        -1, null, "game_type_choose_new_opponent", false, -1, -1, -1);
-//                Comm.sendObject(chooseNewOpponentRequest);
+                // send out a post-endgame request specifying NO rematch
+                final PostEndGameActionRequest declineRematchRequest = new PostEndGameActionRequest(1, Model.getUserLogin().getUserName(),
+                        2, Model.getOpponentUsername(), null, false, -1, -1, -1);
+                Comm.sendObject(declineRematchRequest);
 
                 switchToChooseOpponentActivity();
             }
@@ -121,9 +123,22 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         }
     }
 
+    private void dismissSelectOpponentRequestDialog()
+    {
+        Log.d(TAG, "dismissSelectOpponentRequestDialog");
+
+        if(selectOpponentRequestDialog != null)
+        {
+            selectOpponentRequestDialog.dismiss();
+        }
+    }
+
     private void switchToChooseOpponentActivity()
     {
         Log.d(TAG, "switchToChooseOpponentActivity");
+
+        dismissGameOverDialog();
+        dismissSelectOpponentRequestDialog();
 
         Intent intent = new Intent(GameOverActivity.this, ChooseOpponentActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -184,11 +199,10 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
             Log.d(TAG, "handleIncomingObject: ***STARTING GAME***");
             switchToGameSetupActivity();
         }
-        /*else if (obj instanceof PostEndGameActionResponse)
+        else if (obj instanceof PostEndGameActionResponse)
         {
-            Log.d(TAG, "handleIncomingObject: PostEndGameActionResponse - BEHAVIOR TBD **************");
-            //doStuff(PostEndGameActionRequest) obj);
-        }*/
+            handlePostEndGameActionResponse((PostEndGameActionResponse) obj);
+        }
         else
         {
             Log.d(TAG, "handleIncomingObject: object ignored.");
@@ -205,11 +219,23 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
             Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
             GameManager.resetScore();
             Model.setOpponentUsername(response.getSourceUserName());
+            dismissGameOverDialog();
             switchToGameSetupActivity();
         }
         else
         {
             Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+        }
+    }
+
+    private void handlePostEndGameActionResponse(PostEndGameActionResponse response)
+    {
+        Log.d(TAG, "handlePostEndGameActionResponse");
+
+        if(!response.getRequestAccepted())
+        {
+            Log.d(TAG, "handlePostEndGameActionResponse: request for rematch REJECTED!");
+            switchToChooseOpponentActivity();
         }
     }
 
@@ -219,6 +245,9 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
     private void switchToGameSetupActivity()
     {
         Log.d(TAG, "switchToGameSetupActivity from GameOverActivity");
+
+        dismissGameOverDialog();
+        dismissSelectOpponentRequestDialog();
 
         // create an Intent for launching the Game Setup Activity, with optional additional params
         Context thisContext = GameOverActivity.this;
@@ -234,17 +263,17 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
     {
         Log.d(TAG, "showSelectOpponentRequestDialog");
 
+        dismissSelectOpponentRequestDialog();
+
         final String sourceUsername = request.getSourceUsername();
-        AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("Opponent Request");
-        dialog.setMessage("You have been invited to have a rematch with: " + request.getSourceUsername());
+        selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
+        selectOpponentRequestDialog.setTitle("Opponent Request");
+        selectOpponentRequestDialog.setMessage("You have been invited to have a rematch with: " + request.getSourceUsername());
 
         // set up and listener for Accept button
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener()
-        {
+        selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 // we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
@@ -254,7 +283,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         });
 
         // set up and listener for Decline button
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener() {
+        selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
@@ -265,7 +294,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
             }
         });
 
-        dialog.show();
+        selectOpponentRequestDialog.show();
     }
 
 

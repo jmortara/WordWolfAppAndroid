@@ -52,6 +52,9 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	// game prep buttons
 	private ImageButton chooseOpponentButton;
 
+	// dialog
+	private AlertDialog selectOpponentRequestDialog = null;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -306,6 +309,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 			Model.getGameBoard().printBoardData();
 
 			Log.d(TAG, "handleIncomingObject: ***STARTING GAME***");
+			dismissSelectOpponentRequestDialog();
 			launchBoardActivity();
 		}
 		else
@@ -319,16 +323,14 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		Log.d(TAG, "showSelectOpponentRequestDialog");
 
 		final String sourceUsername = request.getSourceUsername();
-		AlertDialog dialog = new AlertDialog.Builder(this).create();
-		dialog.setTitle("Opponent Request");
-		dialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
+		selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
+		selectOpponentRequestDialog.setTitle("Opponent Request");
+		selectOpponentRequestDialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
 
 		// set up and listener for Accept button
-		dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener()
-		{
+		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
+			public void onClick(DialogInterface dialog, int which) {
 				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
@@ -339,11 +341,9 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		});
 
 		// set up and listener for Decline button
-		dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener()
-		{
+		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
+			public void onClick(DialogInterface dialog, int which) {
 				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
@@ -352,7 +352,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 			}
 		});
 
-		dialog.show();
+		selectOpponentRequestDialog.show();
 	}
 
 	private void handleSelectOpponentResponse(SelectOpponentResponse response)
@@ -364,11 +364,22 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
 			Model.setOpponentUsername(response.getSourceUserName());
+			dismissSelectOpponentRequestDialog();
 			launchGameSetupActivity();
 		}
 		else
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+		}
+	}
+
+	private void dismissSelectOpponentRequestDialog()
+	{
+		Log.d(TAG, "dismissSelectOpponentRequestDialog");
+
+		if(selectOpponentRequestDialog != null)
+		{
+			selectOpponentRequestDialog.dismiss();
 		}
 	}
 

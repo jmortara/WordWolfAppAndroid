@@ -1,5 +1,7 @@
 package com.mortaramultimedia.wordwolfappandroid.data;
 
+import android.util.Log;
+
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 
 import java.util.ArrayList;
@@ -36,8 +38,31 @@ public class Model
 	public static ArrayList<String> validWordsThisGame;
 	public static HashMap<String, String> clientDictionary;
 
-	public static Boolean DEV_DEBUG_MODE = false;				// custom debug flag for developer use
+	// Debug settings
+	public static final Boolean DEV_DEBUG_MODE          = false;				// custom debug flag for developer use
+	public static final Boolean DEV_DEBUG_USE_LOCAL_IP  = true;				// custom debug flag: use local machine IP?
+	public static final String  DEV_DEBUG_LOCAL_IP_ADDR = "10.0.1.2";			// custom debug setting: local machine IP address (may change after reboots)
 
+
+	/**
+	 * Get the host IP used for connection to WordWolf Server. Could be the remote server, or the local machine IP.
+	 * @return
+	 */
+	public static String getHostIP()
+	{
+		String host = null;
+		if(!DEV_DEBUG_USE_LOCAL_IP)
+		{
+			host = HOST;
+			Log.d(TAG, "getHostIP: using host: " + HOST);
+		}
+		else if(DEV_DEBUG_USE_LOCAL_IP)
+		{
+			host = DEV_DEBUG_LOCAL_IP_ADDR;
+			Log.w(TAG, "getHostIP: *****using local machine host******: " + HOST);
+		}
+		return host;
+	}
 
 
 	////////////////////////
