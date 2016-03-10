@@ -50,6 +50,13 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		super.onResume();
 	}
 
+	@Override
+	public void onBackPressed()
+	{
+		Log.d(TAG, "onBackPressed: Ignoring.");
+		// do nothing
+	}
+
 	private void init() {
 		Log.d(TAG, "init");
 

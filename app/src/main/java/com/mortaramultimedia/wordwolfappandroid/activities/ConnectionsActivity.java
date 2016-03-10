@@ -326,6 +326,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
 		selectOpponentRequestDialog.setTitle("Opponent Request");
 		selectOpponentRequestDialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
+		selectOpponentRequestDialog.setCancelable(false);
 
 		// set up and listener for Accept button
 		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {

@@ -51,6 +51,13 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 	}
 
+	@Override
+	public void onBackPressed()
+	{
+		Log.d(TAG, "onBackPressed: Ignoring.");		//TODO - instead of Back, add a Cancel Game button
+		// do nothing
+	}
+
 	/**
 	 * Create the needed references to buttons and UI elements.
 	 */

@@ -48,6 +48,13 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         sendEndGameRequest();
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        Log.d(TAG, "onBackPressed: Ignoring.");
+        // do nothing
+    }
+
     /**
      * Update this activity's UI.
      */
@@ -72,6 +79,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         dismissGameOverDialog();
 
         gameOverDialog = new AlertDialog.Builder(this).create();
+        gameOverDialog.setCancelable(false);
         gameOverDialog.setTitle("Game Over, " + Model.getUserLogin().getUserName() + "!");
         gameOverDialog.setMessage(
                 "Your game with " + Model.getOpponentUsername() + " has ended.\n" +
@@ -290,6 +298,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
         selectOpponentRequestDialog.setTitle("Opponent Request");
         selectOpponentRequestDialog.setMessage("You have been invited to have a rematch with: " + request.getSourceUsername());
+        selectOpponentRequestDialog.setCancelable(false);
 
         // set up and listener for Accept button
         selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
@@ -327,6 +336,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         dismissOpponentNotAvailableDialog();
 
         opponentNotAvailableDialog = new AlertDialog.Builder(this).create();
+        opponentNotAvailableDialog.setCancelable(false);
         opponentNotAvailableDialog.setTitle("This Opponent Is Not Available, " + Model.getUserLogin().getUserName() + "!");
         opponentNotAvailableDialog.setMessage("Unfortunately, " + Model.getOpponentUsername() + " is not available for a rematch.\n\n" +
                         "Try another opponent!"
