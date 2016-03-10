@@ -134,30 +134,17 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		}
 		else if (obj instanceof GetPlayerListResponse)
 		{
-			ArrayList<String> players = (((GetPlayerListResponse) obj).getPlayersCopy());
-			if(players != null)
-			{
-				if (players.size() > 0)
-				{
-					Log.d(TAG, "handleIncomingObject: players list: " + players);
-					playersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, players);
-					opponentsListView.setAdapter(playersAdapter);
-				}
-				else if (players.size() == 0)
-				{
-					Log.w(TAG, "handleIncomingObject: WARNING: empty players list. UI may show no avail opponents.");
-				}
-			}
-			else
-			{
-				Log.w(TAG, "handleIncomingObject: WARNING: null players list. UI may show no avail opponents.");
-			}
+			handleGetPlayerListResponse((GetPlayerListResponse) obj);
 		}
 		else if (obj instanceof SelectOpponentRequest)
 		{
 			if (((SelectOpponentRequest) obj).getDestinationUserName().equals(Model.getUserLogin().getUserName()))
 			{
 				showSelectOpponentRequestDialog((SelectOpponentRequest) obj);
+			}
+			else
+			{
+				Log.w(TAG, "handleIncomingObject: WARNING: SelectOpponentRequest name mismatch: " + obj);
 			}
 		}
 		else if (obj instanceof SelectOpponentResponse)
@@ -166,22 +153,39 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		}
 		else if(obj instanceof CreateGameResponse)
 		{
-			Log.d(TAG, "handleIncomingObject: CreateGameResponse CAME IN: " + obj);
-
-			// store the GameBoard and game duration in the Model
-			CreateGameResponse response = (CreateGameResponse) obj;
-			Model.setGameBoard(response.getGameBoard());
-			Model.setGameDurationMS(response.getGameDurationMS());
-
-			Log.d(TAG, "handleIncomingObject: GAME BOARD RECEIVED: \n");
-			Model.getGameBoard().printBoardData();
-
-			Log.d(TAG, "handleIncomingObject: ***STARTING GAME***");
-			launchBoardActivity();
+			handleCreateGameResponse((CreateGameResponse) obj);
 		}
 		else
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
+		}
+	}
+
+
+	private void handleGetPlayerListResponse(GetPlayerListResponse response)
+	{
+		Log.d(TAG, "handleGetPlayerListResponse: " + response);
+
+		ArrayList<String> playersList = (response.getPlayersCopy());
+
+		if(playersList != null)
+		{
+			if (playersList.size() > 0)
+			{
+				Log.d(TAG, "handleGetPlayerListResponse: players list: " + playersList);
+			}
+
+			if (playersList.size() == 0)
+			{
+				Log.w(TAG, "handleGetPlayerListResponse: WARNING: empty players list. UI may show no avail opponents.");
+			}
+
+			playersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, playersList);
+			opponentsListView.setAdapter(playersAdapter);
+		}
+		else
+		{
+			Log.w(TAG, "handleGetPlayerListResponse: WARNING: null players list. UI may show no avail opponents.");
 		}
 	}
 
@@ -237,6 +241,21 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		{
 			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
 		}
+	}
+
+	private void handleCreateGameResponse(CreateGameResponse response)
+	{
+		Log.d(TAG, "handleCreateGameResponse: CreateGameResponse CAME IN: " + response);
+
+		// store the GameBoard and game duration in the Model
+		Model.setGameBoard(response.getGameBoard());
+		Model.setGameDurationMS(response.getGameDurationMS());
+
+		Log.d(TAG, "handleCreateGameResponse: GAME BOARD RECEIVED: \n");
+		Model.getGameBoard().printBoardData();
+
+		Log.d(TAG, "handleCreateGameResponse: ***STARTING GAME***");
+		launchBoardActivity();
 	}
 
 	/**

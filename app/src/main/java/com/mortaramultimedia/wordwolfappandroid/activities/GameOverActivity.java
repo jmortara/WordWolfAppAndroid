@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
@@ -21,6 +22,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
     private static final String TAG = "GameOverActivity";
     private AlertDialog gameOverDialog = null;
     private AlertDialog selectOpponentRequestDialog = null;
+    private AlertDialog opponentNotAvailableDialog = null;
 
 
     @Override
@@ -91,6 +93,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
                         Model.getGameDurationMS());
                 Comm.sendObject(rematchRequest);
                 //TODO - show test or toast saying "Waiting for Opponent to respond..."
+                showContactingOpponentToast(rematchRequest.getOpponentUserName());
             }
         });
 
@@ -113,6 +116,13 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         gameOverDialog.show();
     }
 
+    private void showContactingOpponentToast(String opponentUsername)
+    {
+        Log.d(TAG, "showContactingOpponentToast");
+
+        Toast.makeText(this, "Contacting " + opponentUsername + ", one moment...", Toast.LENGTH_LONG).show();
+    }
+
     private void dismissGameOverDialog()
     {
         Log.d(TAG, "dismissGameOverDialog");
@@ -130,6 +140,16 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         if(selectOpponentRequestDialog != null)
         {
             selectOpponentRequestDialog.dismiss();
+        }
+    }
+
+    private void dismissOpponentNotAvailableDialog()
+    {
+        Log.d(TAG, "dismissOpponentNotAvailableDialog");
+
+        if(opponentNotAvailableDialog != null)
+        {
+            opponentNotAvailableDialog.dismiss();
         }
     }
 
@@ -224,7 +244,8 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         }
         else
         {
-            Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+            Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! (or opponent offline) from: " + response.getSourceUserName());
+            showOpponentNotAvailableDialog(response);
         }
     }
 
@@ -295,6 +316,32 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         });
 
         selectOpponentRequestDialog.show();
+    }
+
+    private void showOpponentNotAvailableDialog(SelectOpponentResponse response)
+    {
+        Log.d(TAG, "showOpponentNotAvailableDialog");
+
+        dismissGameOverDialog();
+        dismissSelectOpponentRequestDialog();
+        dismissOpponentNotAvailableDialog();
+
+        opponentNotAvailableDialog = new AlertDialog.Builder(this).create();
+        opponentNotAvailableDialog.setTitle("This Opponent Is Not Available, " + Model.getUserLogin().getUserName() + "!");
+        opponentNotAvailableDialog.setMessage("Unfortunately, " + Model.getOpponentUsername() + " is not available for a rematch.\n\n" +
+                        "Try another opponent!"
+        );
+
+        // set up and listener for Accept button
+        opponentNotAvailableDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK!", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "showOpponentNotAvailableDialog: dialog button pressed: positive");
+                switchToChooseOpponentActivity();
+            }
+        });
+
+        opponentNotAvailableDialog.show();
     }
 
 
