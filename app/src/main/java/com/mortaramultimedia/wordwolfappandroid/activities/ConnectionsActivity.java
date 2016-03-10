@@ -14,8 +14,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.mortaramultimedia.wordwolf.shared.constants.Constants;
 import com.mortaramultimedia.wordwolf.shared.messages.*;
+import com.mortaramultimedia.wordwolf.shared.constants.Constants;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
