@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -59,8 +58,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	private AutoCompleteTextView mUsernameView;		// username text field
 	private AutoCompleteTextView mEmailView;		// email text field
 	private EditText mPasswordView;					// password text field
-	private ImageButton mSignInView;				// login button
-	private ImageButton mClearInputButton;			// clear input fields button
+	private ImageButton mDoLoginButton;				// login button
+	private ImageButton mClearInputFieldsButton;	// clear input fields button
 	private ImageButton mCreateNewAccountView;		// create new account button
 	private ImageButton mSetUserToTest1View;		// set user to test1 button
 	private ImageButton mSetUserToTest2View;		// set user to test2 button
@@ -89,9 +88,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mUsernameView 			= (AutoCompleteTextView) 	findViewById(R.id.username);
 		mEmailView 				= (AutoCompleteTextView) 	findViewById(R.id.email);
 		mPasswordView 			= (EditText) 				findViewById(R.id.password);
-		mSignInView 			= (ImageButton) 			findViewById(R.id.account_log_in_button);
-		mClearInputButton		= (ImageButton) 			findViewById(R.id.clear_input_button);
-		mCreateNewAccountView	= (ImageButton) 			findViewById(R.id.create_new_account_button);
+		mDoLoginButton 			= (ImageButton) 			findViewById(R.id.doLoginButton);
+		mClearInputFieldsButton = (ImageButton) 			findViewById(R.id.clearInputFieldsButton);
+		mCreateNewAccountView	= (ImageButton) 			findViewById(R.id.createNewAccountButton);
 		mSetUserToTest1View 	= (ImageButton) 			findViewById(R.id.setUserToTest1_button);
 		mSetUserToTest2View		= (ImageButton) 			findViewById(R.id.setUserToTest2_button);
 		mProgressView 			= (View) 					findViewById(R.id.login_progress);
@@ -102,19 +101,19 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 
 		// assign Log In behavior
-		mSignInView.setOnClickListener(new OnClickListener() {
+		mDoLoginButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.d(TAG, "mSignInView clicked");
+				Log.d(TAG, "mDoLoginButton clicked");
 				attemptLogin();
 			}
 		});
 
 		// assign Clear Input Fields behavior
-		mClearInputButton.setOnClickListener(new OnClickListener() {
+		mClearInputFieldsButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.w(TAG, "mClearInputButton clicked");
+				Log.w(TAG, "mClearInputFieldsButton clicked");
 				clearInputFields();
 			}
 		});
