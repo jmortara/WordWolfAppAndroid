@@ -435,7 +435,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		Log.d(TAG, "handleGameMoveResponse: " + response);
 
 		// if the response was for an accepted move request, add the score to the player's score
-		if (response.getRequestAccepted())
+		/*if (response.getRequestAccepted())
 		{
 			int movePointsAwarded = response.getPointsAwarded();
 			int newTotalScore = response.getNewScore();
@@ -445,7 +445,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		else
 		{
 			Log.d(TAG, "handleGameMoveResponse: WARNING: submitted move was not accepted by server.");
-		}
+		}*/
 		publishObject(response);   // this should also update the UI with any score updates
 	}
 

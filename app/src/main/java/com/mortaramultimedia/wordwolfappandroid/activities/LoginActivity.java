@@ -95,7 +95,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mSetUserToTest2View		= (ImageButton) 			findViewById(R.id.setUserToTest2_button);
 		mProgressView 			= (View) 					findViewById(R.id.login_progress);
 
-		// set default values in text fields to expedite testing - TODO: remove
+		// set default values in text fields to expedite testing
 		setDefaults();
 
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
@@ -154,8 +154,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	@Override
 	protected void onResume()
 	{
-		Log.d(TAG, "onResume");
 		super.onResume();
+		Log.d(TAG, "onResume");
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 	}
 

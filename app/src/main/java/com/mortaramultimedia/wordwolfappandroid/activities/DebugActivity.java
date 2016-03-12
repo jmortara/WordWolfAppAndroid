@@ -100,8 +100,8 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 	@Override
 	protected void onResume()
 	{
-		Log.d(TAG, "onResume");
 		super.onResume();
+		Log.d(TAG, "onResume");
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 	}
 

@@ -7,26 +7,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.mortaramultimedia.wordwolf.shared.messages.GameMove;
-import com.mortaramultimedia.wordwolf.shared.messages.GameMoveRequest;
-import com.mortaramultimedia.wordwolf.shared.messages.TileData;
+import com.mortaramultimedia.wordwolf.shared.messages.*;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
 import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
+import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
 import java.util.ArrayList;
 
 /**
  * Created by Jason Mortara on 11/15/14.
  */
-public class BoardActivity extends Activity implements BoardFragment.OnFragmentInteractionListener
+public class BoardActivity extends Activity implements BoardFragment.OnFragmentInteractionListener, IExtendedAsyncTask
 {
 
 	private static final String TAG = "BoardActivity";
@@ -39,15 +40,16 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_board);
 
-		//TODO - note, since this Activity does not implement IExtendedAsyncTask, it won't receive incoming objects from ServerIOTask
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 		init();
 	}
 
 	@Override
 	protected void onResume()
 	{
-		Log.d(TAG, "onResume");
 		super.onResume();
+		Log.d(TAG, "onResume");
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 	}
 
 	@Override
@@ -134,7 +136,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	public void updateScoreDisplay()
 	{
 		Log.d(TAG, "updateScoreDisplay");
-		Integer newScore = Integer.valueOf(Model.validWordsThisGame.size());
+		Integer newScore = Model.getScore();	//Integer.valueOf(Model.validWordsThisGame.size());
 		String newScoreStr = newScore.toString();
 		scoreText.setText(newScoreStr);
 //		scoreText.setText(getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size());
@@ -165,7 +167,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		boardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.boardFragment);
 		boardFragment.resetAllTileViews();
 		updateWordDisplay();
-		updateScoreDisplay();
+		//updateScoreDisplay();
 	}
 
 	public void handleViewDictionaryButtonClick(View view)
@@ -227,6 +229,79 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		return super.onOptionsItemSelected(item);
 	}
 
+
+	@Override
+	public void handleIncomingObject(Object obj)
+	{
+		Log.d(TAG, "handleIncomingObject: " + obj);
+
+		if(obj instanceof SimpleMessage)
+		{
+			Log.d(TAG, "handleIncomingObject: SimpleMessage: " + ((SimpleMessage)obj).getMsg());
+		}
+		else if(obj instanceof GameMoveResponse)
+		{
+			handleGameMoveResponse((GameMoveResponse) obj);
+		}
+		else
+		{
+			Log.d(TAG, "handleIncomingObject: object ignored.");
+		}
+	}
+
+	private void handleGameMoveResponse(GameMoveResponse response)
+	{
+		Log.d(TAG, "handleGameMoveResponse");
+
+		// if the response was for an accepted move request, add the score to the player's score
+		if(response.getRequestAccepted() && response.getGameMoveValid() && response.getPointsAwarded() > 0)
+		{
+			String wordSubmitted 	= response.getWordSubmitted();
+			int movePointsAwarded 	= response.getPointsAwarded();
+			int newTotalScore 		= response.getNewScore();
+			showAcceptedPlayerWordToast(wordSubmitted, movePointsAwarded);
+			Model.setScore(newTotalScore);
+			updateScoreDisplay();
+			Log.d(TAG, "handleGameMoveResponse: move accepted: " + wordSubmitted + ", " + movePointsAwarded + " points. New score: " + Model.getScore());
+		}
+		else
+		{
+			Log.w(TAG, "handleGameMoveResponse: WARNING: matching request was not accepted, or submitted move was not accepted by server, or move was worth no points. Ignoring.");
+		}
+	}
+
+	private void showAcceptedPlayerWordToast(String wordSubmitted, int pointsAwarded)
+	{
+		Log.d(TAG, "showAcceptedPlayerWordToast: " + wordSubmitted + ", " + pointsAwarded);
+
+		final long TOAST_DURATION_MS	= 500;
+		final int TOAST_OFFSET_X		= 0;
+		final int TOAST_OFFSET_Y 		= 65;
+
+		final Toast playerWordToast = Toast.makeText(BoardActivity.this, wordSubmitted + ": " + pointsAwarded, Toast.LENGTH_SHORT);
+		playerWordToast.setGravity(Gravity.TOP | Gravity.CENTER, TOAST_OFFSET_X, TOAST_OFFSET_Y);
+		playerWordToast.show();
+
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				playerWordToast.cancel();
+			}
+		}, TOAST_DURATION_MS);
+	}
+
+	/**
+	 * IExtendedAsyncTask overrides
+	 * TODO = still called?
+	 */
+	@Override
+	public void onTaskCompleted()
+	{
+		Log.d(TAG, "onTaskCompleted - NO BEHAVIOR");
+	}
 
 }
 

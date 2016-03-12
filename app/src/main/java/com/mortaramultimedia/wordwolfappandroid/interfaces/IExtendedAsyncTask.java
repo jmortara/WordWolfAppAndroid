@@ -9,13 +9,13 @@ package com.mortaramultimedia.wordwolfappandroid.interfaces;
 public interface IExtendedAsyncTask
 {
 	/**
-	 * Called when the Async task has completed, typically during onPostExecute()
-	 */
-	void onTaskCompleted();
-
-	/**
 	 * Handle an incoming object from the server.
 	 * @param obj
 	 */
 	void handleIncomingObject(Object obj);
+
+	/**
+	 * Called when the Async task has completed, typically during onPostExecute()
+	 */
+	void onTaskCompleted();
 }
