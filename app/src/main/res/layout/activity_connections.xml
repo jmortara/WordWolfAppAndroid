@@ -113,6 +113,16 @@
 		android:onClick="handleLoginButtonClick"
 		/>
 
+	<ImageButton
+		android:id="@+id/createNewAccountButton"
+		android:src="@drawable/login_button_create_new_account"
+		android:background="@android:color/transparent"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="20dp"
+		android:onClick="handleCreateNewAccountButtonClick"
+		/>
+
 	<!--Button
 		android:id="@+id/loginButton"
 		android:text="Log In"

@@ -8,6 +8,7 @@ import com.mortaramultimedia.wordwolf.shared.constants.*;
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -167,9 +168,13 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 							handleIncomingObject(responseObj);
 						}
 					}
-					catch (IOException | ClassNotFoundException e)
+					catch(EOFException e)		// could be caused by server going down
 					{
 						e.printStackTrace();
+					}
+					catch (IOException | ClassNotFoundException e1)
+					{
+						e1.printStackTrace();
 					}
 				}
 
@@ -284,10 +289,10 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 		/**
 		 * If receiving a CreateNewAccountResponse...
 		 */
-			/*else if(obj instanceof CreateNewAccountResponse)
-			{
-				handleCreateNewAccountResponse(((CreateNewAccountResponse) obj), out);
-			}*/
+		else if(obj instanceof CreateNewAccountResponse)
+		{
+			handleCreateNewAccountResponse(((CreateNewAccountResponse) obj));
+		}
 		/**
 		 * If receiving a CreateGameResponse, create a GameBoard and distribute it to matched players.
 		 */
@@ -361,6 +366,12 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 	{
 		Log.d(TAG, "handleConnectToDatabaseResponse: " + response);
 		Model.setConnectedToDatabase(response.getSuccess());
+		publishObject(response);
+	}
+
+	private void handleCreateNewAccountResponse(CreateNewAccountResponse response)
+	{
+		Log.d(TAG, "handleCreateNewAccountResponse: " + response);
 		publishObject(response);
 	}
 

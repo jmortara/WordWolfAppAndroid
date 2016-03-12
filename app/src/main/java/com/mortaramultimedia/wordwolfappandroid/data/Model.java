@@ -18,6 +18,8 @@ public class Model
 
 	private static Properties databaseProps = null;
 	private static LoginRequest userLogin = null;
+
+	private static CreateNewAccountRequest createNewAccountRequest = null;
 	private static String opponentUsername = null;
 	private static Object incomingObj = null;
 	private static SelectOpponentRequest selectOpponentRequest = null;
@@ -27,20 +29,22 @@ public class Model
 	public static final String HOST = "wordwolfgame.com";	// WARNING - will connect to any site hosted on jasonmortara.com
 	public static final int PORT = 4001;
 
-	private static Boolean connected 	= false;
+	private static Boolean connected 			= false;
 	private static Boolean connectedToDatabase 	= false;
-//	private static Boolean dbTestOK 	= false;
-	private static Boolean loggedIn 	= false;
-	private static Integer score 		= 0;
+
+	//	private static Boolean dbTestOK 			= false;
+	private static Boolean newAccountCreated	= false;
+	private static Boolean loggedIn 			= false;
+	private static Integer score 				= 0;
 
 	// moved from old single-player Model
 	public static ArrayList<TileData> selectedTiles;
 	public static ArrayList<String> validWordsThisGame;
 	public static HashMap<String, String> clientDictionary;
 
-	// Debug settings
+	// DEBUG SETTINGS
 	public static final Boolean DEV_DEBUG_MODE          = false;			// custom debug flag for developer use
-	public static final Boolean DEV_DEBUG_USE_LOCAL_IP  = false;			// custom debug flag: use local machine IP?
+	public static final Boolean DEV_DEBUG_USE_LOCAL_IP  = true;			// custom debug flag: use local machine IP?
 	public static final String  DEV_DEBUG_LOCAL_IP_ADDR = "10.0.1.2";		// custom debug setting: local machine IP address (may change after reboots) // terminal: to lookup IP use: ipconfig getifaddr en0
 
 
@@ -78,6 +82,17 @@ public class Model
 		Model.databaseProps = databaseProps;
 	}
 
+	public static Boolean getNewAccountCreated()
+	{
+		return newAccountCreated;
+	}
+
+	public static void setNewAccountCreated(Boolean newAccountCreated)
+	{
+		Model.newAccountCreated = newAccountCreated;
+		Log.w(TAG, "setUserLogin: newAccountCreated is now: " + Model.newAccountCreated);
+	}
+
 	public static LoginRequest getUserLogin()
 	{
 		return userLogin;
@@ -86,6 +101,17 @@ public class Model
 	public static void setUserLogin(LoginRequest userLogin)
 	{
 		Model.userLogin = userLogin;
+		Log.w(TAG, "setUserLogin: userLogin is now: " + Model.userLogin);
+	}
+
+	public static CreateNewAccountRequest getCreateNewAccountRequest()
+	{
+		return createNewAccountRequest;
+	}
+
+	public static void setCreateNewAccountRequest(CreateNewAccountRequest createNewAccountRequest)
+	{
+		Model.createNewAccountRequest = createNewAccountRequest;
 	}
 
 	public static String getOpponentUsername()
@@ -170,6 +196,7 @@ public class Model
 	public static void setLoggedIn(Boolean loggedIn)
 	{
 		Model.loggedIn = loggedIn;
+		Log.w(TAG, "setLoggedIn: loggedIn is now: " + Model.loggedIn);
 	}
 
 	public static Integer getScore()

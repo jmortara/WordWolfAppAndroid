@@ -4,25 +4,24 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.mortaramultimedia.wordwolf.shared.messages.CreateNewAccountResponse;
-import com.mortaramultimedia.wordwolf.shared.messages.LoginResponse;
-import com.mortaramultimedia.wordwolfappandroid.data.Model;
+import com.mortaramultimedia.wordwolf.shared.messages.*;
+import com.mortaramultimedia.wordwolfappandroid.activities.LoginActivity;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
+import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
-import com.mortaramultimedia.wordwolf.shared.messages.LoginRequest;
 
 import java.io.InputStream;
 import java.io.StreamCorruptedException;
 import java.util.Properties;
 
 /**
- * LoginAsyncTask - AsyncTask which handles logging the app user in
- * Created by Jason Mortara on 1/24/2016
+ * CreateNewAccountAsyncTask - AsyncTask which handles creating a new user entry in the remote database.
+ * Created by Jason Mortara on 3/09/2016
  */
-public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements IExtendedAsyncTask
+public class CreateNewAccountAsyncTask extends AsyncTask<Void, Integer, Integer> implements IExtendedAsyncTask
 {
 	// statics
-	private static final String TAG = "LoginAsyncTask";
+	private static final String TAG = "CreateNewAcctAsyncTask";
 
 	// privates
 	private Activity activity = null;
@@ -30,9 +29,9 @@ public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements
 
 
 	// constructor
-	public LoginAsyncTask(Activity activity, IExtendedAsyncTask caller)
+	public CreateNewAccountAsyncTask(Activity activity, IExtendedAsyncTask caller)
 	{
-		Log.d(TAG, "LoginAsyncTask constructor, called from " + activity.getLocalClassName());
+		Log.d(TAG, "CreateNewAccountAsyncTask constructor, called from " + activity.getLocalClassName());
 
 		this.activity = activity;
 		this.taskCompleteCallbackObj = caller;
@@ -90,16 +89,11 @@ public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements
 
 		if (Model.getDatabaseProps() != null)
 		{
-			Log.d(TAG, "doInBackground: Attempting user login through server command");
+			Log.d(TAG, "doInBackground: Attempting new account creation through server command");
 			try
 			{
-//				LoginMessage newLogin = new LoginMessage(1, "<username>", "<pass>", "<email>");		// for debugging a specific user
-//				Model.userLogin = newLogin;
-//				loginSucceeded = MySQLAccessTester.attemptLogin();
-
-				// try loggin in
-				LoginRequest loginRequest = Model.getUserLogin();
-				Comm.out().writeObject(loginRequest);
+				CreateNewAccountRequest createNewAccountRequest = Model.getCreateNewAccountRequest();
+				Comm.out().writeObject(createNewAccountRequest);
 				Comm.out().flush();
 			}
 			catch(StreamCorruptedException e)
@@ -112,18 +106,18 @@ public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements
 			}
 		}
 
-		// loop until either Model.loggedIn is true or the login attempt exceeds specified wait time.
+		// loop until either Model.newAccountCreated is true or the Create New Account attempt exceeds specified wait time.
 		final long MAX_WAIT_TIME_MS = 5000;
 		long msWaited = 0;
 		long waitIncrement = 100;
 
 		try
 		{
-			while(!Model.getLoggedIn() && msWaited < MAX_WAIT_TIME_MS)
+			while(!Model.getNewAccountCreated() && msWaited < MAX_WAIT_TIME_MS)
 			{
 				synchronized (this)
 				{
-					Log.d(TAG, "doInBackground: waiting for login response... " + msWaited + "ms...");
+					Log.d(TAG, "doInBackground: waiting for Create New Account response... " + msWaited + "ms...");
 					wait(waitIncrement);
 					msWaited += waitIncrement;
 				}
@@ -134,15 +128,15 @@ public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements
 			e.printStackTrace();
 		}
 
-		if(Model.getLoggedIn())
+		if(Model.getNewAccountCreated())
 		{
-			Log.d(TAG, "doInBackground: login SUCCEEDED after " + msWaited + "ms.");
-			result = Activity.RESULT_OK;
+			Log.d(TAG, "doInBackground: Create New Account SUCCEEDED after " + msWaited + "ms.");
+			result = LoginActivity.RESULT_CREATE_NEW_ACCOUNT_OK;
 		}
 		else
 		{
-			Log.d(TAG, "doInBackground: login FAILED after " + msWaited + "ms.");
-			result = Activity.RESULT_CANCELED;
+			Log.d(TAG, "doInBackground: Create New Account FAILED after " + msWaited + "ms.");
+			result = LoginActivity.RESULT_CREATE_NEW_ACCOUNT_CANCELED;
 		}
 
 		Log.d(TAG, "doInBackground: Returning value of " + result);
@@ -185,29 +179,29 @@ public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements
 		/**
 		 * If receiving a LoginResponse...
 		 */
-		else if (obj instanceof LoginResponse)
+		/*else if (obj instanceof LoginResponse)
 		{
 			handleLoginResponse(((LoginResponse) obj));
-		}
+		}*/
 	}
 
 	private void handleCreateNewAccountResponse(CreateNewAccountResponse response)
 	{
-		Log.d(TAG, "handleCreateNewAccountResponse ******************** : " + response);
+		Log.d(TAG, "handleCreateNewAccountResponse BEHAVIOR TBD ******************** : " + response);
 
 		if(response.getAccountCreationSuccess())
 		{
-			Log.d(TAG, "handleLoginResponse: Create New Account SUCCEEDED. Calling Model.setNewAccountCreated(true)");
+			Log.d(TAG, "handleLoginResponse: login succeeded. Calling Model.setNewAccountCreated(true)");
 			Model.setNewAccountCreated(true);
 		}
 		else
 		{
-			Log.w(TAG, "handleLoginResponse: Create New Account FAILED. Calling Model.setNewAccountCreated(false)");
+			Log.w(TAG, "handleLoginResponse: login FAILED. Calling Model.setNewAccountCreated(false)");
 			Model.setNewAccountCreated(false);
 		}
 	}
 
-	private void handleLoginResponse(LoginResponse response)
+	/*private void handleLoginResponse(LoginResponse response)
 	{
 		Log.d(TAG, "handleLoginResponse ********************** : " + response);
 
@@ -223,6 +217,6 @@ public class LoginAsyncTask extends AsyncTask<Void, Integer, Integer> implements
 		}
 
 //		onTaskCompleted();
-	}
+	}*/
 
-} // end class LoginAsyncTask
+} // end class CreateNewAccountAsyncTask

@@ -83,6 +83,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mortaramultimedia.wordwolfappandroid.activities.BoardActivity"/>
         </activity>
+        <activity
+            android:name=".unused.CreateNewAccountActivity"
+            android:label="@string/title_activity_create_new_account"
+            android:parentActivityName=".activities.ConnectionsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mortaramultimedia.wordwolfappandroid.activities.ConnectionsActivity"/>
+        </activity>
     </application>
 
 </manifest>

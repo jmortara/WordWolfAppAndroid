@@ -838,6 +838,13 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 				handleConnectToDatabaseResponse(((ConnectToDatabaseResponse) obj));
 			}
 			/**
+			 * If receiving a CreateNewAccountResponse...
+			 */
+			else if(obj instanceof CreateNewAccountResponse)
+			{
+				handleCreateNewAccountResponse(((CreateNewAccountResponse) obj));
+			}
+			/**
 			 * If receiving a LoginResponse...
 			 */
 			else if (obj instanceof LoginResponse)
@@ -872,13 +879,6 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 			{
 				handleMessageFromOpponent(((OpponentBoundMessage) obj));
 			}
-			/**
-			 * If receiving a CreateNewAccountResponse...
-			 */
-			/*else if(obj instanceof CreateNewAccountResponse)
-			{
-				handleCreateNewAccountResponse(((CreateNewAccountResponse) obj), out);
-			}*/
 			/**
 			 * If receiving a CreateGameResponse, create a GameBoard and distribute it to matched players.
 			 */
@@ -948,6 +948,11 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 		{
 			Log.d(TAG, "handleConnectToDatabaseResponse: " + response);
 			Model.setConnectedToDatabase(response.getSuccess());
+			publishObject(response);
+		}
+
+		private void handleCreateNewAccountResponse(CreateNewAccountResponse response) {
+			Log.w(TAG, "handleCreateNewAccountResponse: , ***BEHAVIOR TBD***" + response);
 			publishObject(response);
 		}
 
@@ -1112,7 +1117,7 @@ public class ServerActivity extends Activity implements IExtendedAsyncTask
 		if (requestCode == 1)   // see the note in the startActivityForResult above
 		{
 			Log.d(TAG, "onActivityResult: LOGIN SUCCESS returned from LoginActivity. requestCode: " + requestCode);
-			Model.setLoggedIn(true);
+			// Model.setLoggedIn(true); moved to Login
 		}
 		else
 		{

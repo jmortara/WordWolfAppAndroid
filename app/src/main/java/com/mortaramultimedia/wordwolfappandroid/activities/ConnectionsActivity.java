@@ -41,8 +41,9 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	private TextView usernameText;
 	private TextView opponentUsernameText;
 
-	// login button
+	// login buttons
 	private ImageButton loginButton;
+	private ImageButton createNewAccountButton;
 
 	// input text and related refs
 	private TextView inputText;
@@ -52,8 +53,9 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	// game prep buttons
 	private ImageButton chooseOpponentButton;
 
-	// dialog
-	private AlertDialog selectOpponentRequestDialog = null;
+	// dialogs
+	private AlertDialog selectOpponentRequestDialog  = null;
+	private AlertDialog createNewAccountResultDialog = null;
 
 
 	@Override
@@ -64,6 +66,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 
 		createUIReferences();
 		loginButton.setVisibility(View.INVISIBLE);
+		createNewAccountButton.setVisibility(View.INVISIBLE);
 		chooseOpponentButton.setVisibility(View.INVISIBLE);
 		updateUI();
 
@@ -92,6 +95,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		opponentUsernameText 			= (TextView) 	findViewById(R.id.opponentUsernameText);
 
 		loginButton 					= (ImageButton) findViewById(R.id.loginButton);
+		createNewAccountButton			= (ImageButton) findViewById(R.id.createNewAccountButton);
 
 		inputText 						= (EditText)	findViewById(R.id.inputText);
 		hideKeyboardButton 				= (Button)		findViewById(R.id.hideKeyboardButton);
@@ -105,7 +109,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	 */
 	private void updateUI()
 	{
-		Log.d(TAG, "updateUI");
+		Log.d(TAG, "updateUI: user login obj is: " + Model.getUserLogin());
 
 		// Server Connection Indicator
 		connectedToServerCheckBox.setChecked(Model.getConnected());
@@ -128,14 +132,26 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 				usernameText.setText(username);
 			}
 		}
+		else
+		{
+			usernameText.setText("(username)");
+		}
 
 		// Opponent info
 		if (Model.getOpponentUsername() != null)
 		{
 			opponentUsernameText.setText(Model.getOpponentUsername());
 		}
-	}
 
+		if (!Model.getLoggedIn())
+		{
+			chooseOpponentButton.setVisibility(View.INVISIBLE);
+		}
+		else
+		{
+			chooseOpponentButton.setVisibility(View.VISIBLE);
+		}
+	}
 	/*private void connectToServer()	//TODO - implement
 	{
 		Log.d(TAG, "connectToServer");
@@ -194,6 +210,29 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	}
 
 	/**
+	 * Create New Account Button handler - sends new account request to server
+	 * @param view
+	 * @throws IOException
+	 */
+	public void handleCreateNewAccountButtonClick(View view) throws IOException
+	{
+		Log.d(TAG, "handleCreateNewAccountButtonClick");
+
+
+
+
+
+
+		// create an Intent for launching the Login Activity, with optional additional params
+		Context thisContext = ConnectionsActivity.this;
+		Intent intent = new Intent(thisContext, LoginActivity.class);
+		intent.putExtra("testParam", "testValue");                        //optional params
+
+		// start the activity
+		startActivityForResult(intent, 1);      //TODO: note that in order for this class' onActivityResult to be called when the LoginActivity has completed, the requestCode here must be > 0
+	}
+
+	/**
 	 * Choose Opponent button handler. Launches a new activity for selecting an opponent.
 	 * @param view
 	 * @throws IOException
@@ -223,21 +262,38 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 
 	/**
 	 * Handle the result of the activity launched from this one.
-	 * TODO - THE REQUEST CODES ARE NOT WORKING CORRECTLY... FAILED LOGINS ON SERVER SIDE RESULT IN REQUESTCODE 1 HERE
+	 * ResultCodes coming back from launched Activity: RESULT_OK (0), RESULT_CANCELED (-1)
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent)
 	{
-		if (requestCode == 1)   // see the note in the startActivityForResult above
+		if (resultCode == LoginActivity.RESULT_CREATE_NEW_ACCOUNT_OK)
 		{
-			Log.d(TAG, "onActivityResult: LOGIN SUCCESS returned from LoginActivity. requestCode: " + requestCode);
-			Model.setLoggedIn(true);
+			Log.d(TAG, "onActivityResult: Create New Account SUCCESS returned from LoginActivity. resultCode: " + resultCode);
+			createNewAccountButton.setVisibility(View.INVISIBLE);
+			showCreateNewAccountResultDialog();
 		}
-		else
+		else if (resultCode == LoginActivity.RESULT_CREATE_NEW_ACCOUNT_CANCELED)
 		{
-			Log.d(TAG, "onActivityResult: LOGIN FAILURE returned from LoginActivity. requestCode: " + requestCode);
-			Model.setLoggedIn(false);
+			Log.d(TAG, "onActivityResult: Create New Account FAILURE returned from LoginActivity. resultCode: " + resultCode);
+			showCreateNewAccountResultDialog();
 		}
+		else if (resultCode == RESULT_OK)   // see the note in the startActivityForResult above
+		{
+			Log.d(TAG, "onActivityResult: LOGIN SUCCESS returned from LoginActivity. resultCode: " + resultCode);
+		}
+		else if (resultCode == RESULT_CANCELED)
+		{
+			Log.d(TAG, "onActivityResult: LOGIN FAILURE returned from LoginActivity. resultCode: " + resultCode);
+
+			// if we've returned from the LoginActivity with no successful login as defined by the Model, nullify the user login credentials so the UI update reflects that
+			if(!Model.getLoggedIn())
+			{
+				Model.setUserLogin(null);
+			}
+		}
+		else Log.w(TAG, "onActivityResult: WARNING: no case for resultCode: " + resultCode);
+
 		updateUI();
 	}
 
@@ -268,7 +324,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 			}
 			else
 			{
-				Log.d(TAG, "handleIncomingObject: SimpleMessage: " + ((SimpleMessage)obj).getMsg());
+				Log.d(TAG, "handleIncomingObject: SimpleMessage: " + ((SimpleMessage) obj).getMsg());
 			}
 		}
 		else if (obj instanceof ConnectToDatabaseResponse)
@@ -316,6 +372,36 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
 		}
+	}
+
+	private void showCreateNewAccountResultDialog()
+	{
+		Log.d(TAG, "showCreateNewAccountResultDialog");
+
+		createNewAccountResultDialog = new AlertDialog.Builder(this).create();
+		if (Model.getNewAccountCreated())
+		{
+			createNewAccountResultDialog.setTitle("Account Created!");
+			createNewAccountResultDialog.setMessage("Your new account has been created! \n\n" +
+													"Please Log In to continue.");
+		}
+		else
+		{
+			createNewAccountResultDialog.setTitle("New Account Failed");
+			createNewAccountResultDialog.setMessage("Hmm. We could not create a new account for you. \n\n" +
+													"Please try creating an account again, " +
+													"or log in under another username.");
+		}
+		createNewAccountResultDialog.setCancelable(false);
+
+		// set up and listener for Accept button
+		createNewAccountResultDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
+
+		createNewAccountResultDialog.show();
 	}
 
 	private void showSelectOpponentRequestDialog(SelectOpponentRequest request)

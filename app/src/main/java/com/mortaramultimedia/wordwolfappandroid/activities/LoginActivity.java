@@ -26,8 +26,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.mortaramultimedia.wordwolf.shared.messages.CreateNewAccountRequest;
+import com.mortaramultimedia.wordwolf.shared.messages.CreateNewAccountResponse;
+import com.mortaramultimedia.wordwolf.shared.messages.LoginResponse;
 import com.mortaramultimedia.wordwolfappandroid.R;
+import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
+import com.mortaramultimedia.wordwolfappandroid.database.CreateNewAccountAsyncTask;
 import com.mortaramultimedia.wordwolfappandroid.database.LoginAsyncTask;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
@@ -45,7 +50,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 {
 	private static final String TAG = "LoginActivity";
 
-	LoginAsyncTask loginTask;
+	private LoginAsyncTask loginTask;
+	private CreateNewAccountAsyncTask createNewAccountTask;
+	private LoginRequest loginRequest = null;
 
 	// UI references.
 	private View mLoginFormView;					// main form
@@ -53,10 +60,16 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	private AutoCompleteTextView mEmailView;		// email text field
 	private EditText mPasswordView;					// password text field
 	private ImageButton mSignInView;				// login button
+	private ImageButton mClearInputButton;			// clear input fields button
 	private ImageButton mCreateNewAccountView;		// create new account button
 	private ImageButton mSetUserToTest1View;		// set user to test1 button
 	private ImageButton mSetUserToTest2View;		// set user to test2 button
 	private View mProgressView;						// login progress bar/wheel
+
+	// statics
+	public static final int RESULT_CREATE_NEW_ACCOUNT_OK 		= -2;
+	public static final int RESULT_CREATE_NEW_ACCOUNT_CANCELED 	= -3;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -77,6 +90,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mEmailView 				= (AutoCompleteTextView) 	findViewById(R.id.email);
 		mPasswordView 			= (EditText) 				findViewById(R.id.password);
 		mSignInView 			= (ImageButton) 			findViewById(R.id.account_log_in_button);
+		mClearInputButton		= (ImageButton) 			findViewById(R.id.clear_input_button);
 		mCreateNewAccountView	= (ImageButton) 			findViewById(R.id.create_new_account_button);
 		mSetUserToTest1View 	= (ImageButton) 			findViewById(R.id.setUserToTest1_button);
 		mSetUserToTest2View		= (ImageButton) 			findViewById(R.id.setUserToTest2_button);
@@ -84,6 +98,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
 		// set default values in text fields to expedite testing - TODO: remove
 		setDefaults();
+
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 
 		// assign Log In behavior
 		mSignInView.setOnClickListener(new OnClickListener() {
@@ -94,11 +110,21 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 			}
 		});
 
+		// assign Clear Input Fields behavior
+		mClearInputButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.w(TAG, "mClearInputButton clicked");
+				clearInputFields();
+			}
+		});
+
 		// assign Log In behavior
 		mCreateNewAccountView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				Log.w(TAG, "mCreateNewAccountView clicked: behavior TBD");
+				startCreateNewAccount();
 			}
 		});
 
@@ -126,17 +152,34 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
 	}
 
+	@Override
+	protected void onResume()
+	{
+		Log.d(TAG, "onResume");
+		super.onResume();
+		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+	}
+
 	/**
-	 * Does not seem to work. Using buttons instead.
+	 * Works in some circumstances. Using buttons as backup.
 	 */
 	private void setDefaults()
 	{
+		// newly created account
+		if(Model.getNewAccountCreated() && Model.getCreateNewAccountRequest() != null)
+		{
+			Log.d(TAG, "setDefaults: setting fields to stored new account values: " + Model.getCreateNewAccountRequest());
+			setFieldsToNewCreatedAccountValues();
+			return;
+		}
+
 		// emulator
-		if(Build.BRAND.equalsIgnoreCase("generic"))
+		else if(Build.BRAND.equalsIgnoreCase("generic"))
 		{
 			Log.d(TAG, "setDefaults: running in EMULATOR");
 			setFieldsToTestUserNum(2);
 		}
+
 		// device
 		else
 		{
@@ -151,6 +194,15 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mUsernameView.setText("test" + num);
 		mPasswordView.setText("test" + num + "pass");
 		mEmailView.setText("test" + num + "@wordwolfgame.com");
+	}
+
+	private void setFieldsToNewCreatedAccountValues()
+	{
+		Log.d(TAG, "setFieldsToNewCreatedAccountValues");
+		CreateNewAccountRequest storedRequest = Model.getCreateNewAccountRequest();
+		mUsernameView.setText(storedRequest.getUserName());
+		mPasswordView.setText(storedRequest.getPassword());
+		mEmailView.setText(storedRequest.getEmail());
 	}
 
 
@@ -217,7 +269,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		else
 		{
 			// store the login credentials in the Model
-			LoginRequest loginRequest = new LoginRequest(1, username, password, email);
+			this.loginRequest = new LoginRequest(1, username, password, email);
 			Model.setUserLogin(loginRequest);
 
 			// Show a progress spinner,
@@ -358,8 +410,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mEmailView.setAdapter(adapter);
 	}
 
-
-
 	private interface ProfileQuery
 	{
 		String[] PROJECTION = {
@@ -372,6 +422,159 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	}
 
 	/**********************************************************
+	 * Create New Account
+	 */
+	private void startCreateNewAccount()
+	{
+		Log.d(TAG, "startCreateNewAccount");
+
+		if (createNewAccountTask != null)
+		{
+			return;
+		}
+
+		// Reset errors.
+		mEmailView.setError(null);
+		mPasswordView.setError(null);
+
+		// Store values as locals at the time of the create new account attempt.
+		String username 	= mUsernameView.getText().toString();
+		String email 		= mEmailView.getText().toString();
+		String password 	= mPasswordView.getText().toString();
+
+		boolean cancel = false;		// cancel?
+		View focusView = null;		// the focus shifts depending on user input
+
+		// Check for a valid username, if the user entered one.
+		if (!TextUtils.isEmpty(username) && !isUsernameValid(username))
+		{
+			mPasswordView.setError(getString(R.string.error_invalid_username));
+			focusView = mUsernameView;
+			cancel = true;
+		}
+
+		// Check for a valid password, if the user entered one.
+		if (!TextUtils.isEmpty(password) && !isPasswordValid(password))
+		{
+			mPasswordView.setError(getString(R.string.error_invalid_password));
+			focusView = mPasswordView;
+			cancel = true;
+		}
+
+		// Check for a valid email address.
+		if (TextUtils.isEmpty(email))
+		{
+			mEmailView.setError(getString(R.string.error_field_required));
+			focusView = mEmailView;
+			cancel = true;
+		}
+		else if (!isEmailValid(email))
+		{
+			mEmailView.setError(getString(R.string.error_invalid_email));
+			focusView = mEmailView;
+			cancel = true;
+		}
+
+		if (cancel)
+		{
+			// There was an error; don't attempt create new account and focus the first
+			// form field with an error.
+			focusView.requestFocus();
+		}
+		else
+		{
+			// store the Create New Account credentials in the Model, for use by another activity
+			CreateNewAccountRequest createNewAccountRequestRequest = new CreateNewAccountRequest(username, password, email);
+			Model.setCreateNewAccountRequest(createNewAccountRequestRequest);
+
+			// Show a progress spinner,
+			showProgress(true);
+
+			// and kick off a background task to perform the user login attempt.
+			createNewAccountTask = new CreateNewAccountAsyncTask(this, this);
+
+			// workaround for issues with execute() not working properly on AsyncTasks
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			{
+				createNewAccountTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			}
+			else
+			{
+				createNewAccountTask.execute((Void) null);
+			}
+		}
+
+	}
+
+	private void clearInputFields()
+	{
+		mUsernameView.setText("");
+		mPasswordView.setText("");
+		mEmailView.setText("");
+	}
+
+	@Override
+	public void handleIncomingObject(Object obj)
+	{
+		Log.w(TAG, "handleIncomingObject: " + obj);
+
+		if (obj instanceof CreateNewAccountResponse)
+		{
+			handleCreateNewAccountResponse((CreateNewAccountResponse) obj);
+		}
+		else if (obj instanceof LoginResponse)
+		{
+			if (((LoginResponse) obj).getLoginAccepted())
+			{
+				handleLoginResponse((LoginResponse) obj);
+			}
+		}
+		else
+		{
+			Log.d(TAG, "handleIncomingObject: object ignored.");
+		}
+	}
+
+	private void handleCreateNewAccountResponse(CreateNewAccountResponse response)
+	{
+		Log.d(TAG, "handleCreateNewAccountResponse: " + response);
+
+		if(response.getAccountCreationSuccess())
+		{
+			Log.d(TAG, "handleCreateNewAccountResponse: new account creation succeeded. Calling Model.setNewAccountCreated(true)");
+			Model.setNewAccountCreated(true);
+		}
+		else
+		{
+			Log.w(TAG, "handleCreateNewAccountResponse: new account creation FAILED. Calling Model.setNewAccountCreated(false)");
+			Model.setNewAccountCreated(false);
+		}
+	}
+
+	private void handleLoginResponse(LoginResponse response)
+	{
+		Log.d(TAG, "handleLoginResponse: (Model.setLoggedIn() is called here." + response);
+
+		if(response.getLoginAccepted())
+		{
+			Log.d(TAG, "handleLoginResponse: login SUCCEEDED. Calling Model.setLoggedIn(true)");
+			Model.setLoggedIn(true);	// keep
+			Model.setUserLogin(loginRequest);
+		}
+		else
+		{
+			Log.w(TAG, "handleLoginResponse: login FAILED. Calling Model.setLoggedIn(false)");
+			Model.setLoggedIn(false);	// keep
+			Model.setUserLogin(null);
+			this.loginRequest = null;
+		}
+
+		onTaskCompleted();
+	}
+
+
+
+	/**********************************************************
 	 * Overrides for the IExtendedAsyncTask interface methods
 	 */
 	@Override
@@ -379,27 +582,42 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	{
 		// set a result code for the intent to be returned to the activity which called this one
 		Intent returnIntent = new Intent();
-		int resultCode;
+		int resultCode = -999;
 
-		if(Model.getLoggedIn())
+		// if not logged in
+		if(!Model.getLoggedIn())
 		{
-			resultCode = 1;
-			Log.d(TAG, "onTaskCompleted successful with result code: " + resultCode);
+			// we might have just tried to create a new account
+			if(Model.getCreateNewAccountRequest() != null)
+			{
+				if (Model.getNewAccountCreated())
+				{
+					resultCode = LoginActivity.RESULT_CREATE_NEW_ACCOUNT_OK;
+					Log.d(TAG, "onTaskCompleted: Create New Account SUCCEEDED with result code: " + resultCode);
+				}
+				else
+				{
+					resultCode = LoginActivity.RESULT_CREATE_NEW_ACCOUNT_CANCELED;
+					Log.d(TAG, "onTaskCompleted: Create New Account FAILED with result code: " + resultCode);
+				}
+			}
+			// if not, cancel / fail
+			else
+			{
+				resultCode = Activity.RESULT_CANCELED;
+				Log.d(TAG, "onTaskCompleted: login FAILED with result code: " + resultCode);
+			}
 		}
+		// if logged in, success
 		else
 		{
-			resultCode = 0;
-			Log.d(TAG, "onTaskCompleted canceled with result code: " + resultCode);
+			resultCode = Activity.RESULT_OK;
+			Log.d(TAG, "onTaskCompleted: login SUCCEEDED with result code: " + resultCode);
 		}
+
+		// send the result code (1=success or 0=failed) of the login attempt back to the Activity which launched this one.
 		setResult(resultCode, returnIntent);
-
 		this.finish();
-	}
-
-	@Override
-	public void handleIncomingObject(Object obj)
-	{
-		Log.w(TAG, "handleIncomingObject, no cases accounted for, behavior TBD... " + obj);
 	}
 
 
