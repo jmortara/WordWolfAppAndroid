@@ -218,11 +218,6 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "handleCreateNewAccountButtonClick");
 
-
-
-
-
-
 		// create an Intent for launching the Login Activity, with optional additional params
 		Context thisContext = ConnectionsActivity.this;
 		Intent intent = new Intent(thisContext, LoginActivity.class);
@@ -262,7 +257,8 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 
 	/**
 	 * Handle the result of the activity launched from this one.
-	 * ResultCodes coming back from launched Activity: RESULT_OK (0), RESULT_CANCELED (-1)
+	 * ResultCodes coming back from launched Activity:
+	 * RESULT_OK (0), RESULT_CANCELED (-1), RESULT_CREATE_NEW_ACCOUNT_OK (-2), RESULT_CREATE_NEW_ACCOUNT_CANCELED (-3)
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent)

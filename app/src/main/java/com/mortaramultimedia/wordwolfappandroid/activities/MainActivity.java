@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 	{
 		Log.d(TAG, "handleDebugButtonClick");
 
-		Intent settingsIntent = new Intent(this, ServerActivity.class);
+		Intent settingsIntent = new Intent(this, DebugActivity.class);
 		startActivity(settingsIntent);
 	}
 

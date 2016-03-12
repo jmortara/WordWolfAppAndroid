@@ -16,7 +16,7 @@ import java.util.Properties;
 
 /**
  * DatabaseTask - AsyncTask which handles server connections and messaging
- * Note: This class is now only used by ServerActivity for debugging. The Connections Acvitiy uses a request.
+ * Note: This class is now only used by DebugActivity for debugging. The Connections Acvitiy uses a request.
  * Created by Jason Mortara on 1/24/2016
  */
 public class DatabaseAsyncTask extends AsyncTask<Void, Integer, Integer>
