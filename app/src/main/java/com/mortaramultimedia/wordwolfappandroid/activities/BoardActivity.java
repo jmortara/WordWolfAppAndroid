@@ -39,7 +39,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_board);
 
-		//TODO - note, since this Activity does not implement IExtendedAsyncTask, it won't receive incoming objects from ServerTask
+		//TODO - note, since this Activity does not implement IExtendedAsyncTask, it won't receive incoming objects from ServerIOTask
 		init();
 	}
 

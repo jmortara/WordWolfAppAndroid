@@ -28,7 +28,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 {
 	public static final String TAG = "ConnectionsActivity";
 
-//	private ServerTask serverTask;            // async task which handles in/out socket streams
+//	private ServerIOTask serverIOTask;            // async task which handles in/out socket streams
 //	private DatabaseAsyncTask databaseTask;   // external async task
 //	private LoginAsyncTask loginTask;         // external async task
 
@@ -163,14 +163,14 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		}
 
 		// Start network tasks separate from the main UI thread
-		if (serverTask == null && !Model.getConnected())
+		if (serverIOTask == null && !Model.getConnected())
 		{
-			serverTask = new ServerTask(this);
-			serverTask.execute();
+			serverIOTask = new ServerIOTask(this);
+			serverIOTask.execute();
 		}
 		else
 		{
-			Log.d(TAG, "connectToServer: not connected and serverTask is null.");
+			Log.d(TAG, "connectToServer: not connected and serverIOTask is null.");
 		}
 	}*/
 

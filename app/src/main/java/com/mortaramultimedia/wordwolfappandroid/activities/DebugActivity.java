@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -21,7 +20,7 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import com.mortaramultimedia.wordwolfappandroid.R;
-import com.mortaramultimedia.wordwolfappandroid.communications.ServerTask;
+import com.mortaramultimedia.wordwolfappandroid.communications.ServerIOTask;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.database.LoginAsyncTask;
@@ -31,11 +30,6 @@ import com.mortaramultimedia.wordwolf.shared.constants.*;
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,7 +39,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 {
 	private static final String TAG = "DebugActivity";
 
-	private ServerTask serverTask;            // inner async task which handles in/out socket streams
+	private ServerIOTask serverIOTask;        // external async task which handles in/out socket streams
 	private DatabaseAsyncTask databaseTask;   // external async task
 	private LoginAsyncTask loginTask;         // external async task
 	private Timer gameTimer;
@@ -238,12 +232,12 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 			Log.d(TAG, "handleConnectToServerButtonClick: not connected yet.");
 
 			// Start network tasks separate from the main UI thread
-			if (serverTask == null)
+			if (serverIOTask == null)
 			{
-				Log.d(TAG, "handleConnectToServerButtonClick: starting ServerTask and registering this Activity with Comm...");
+				Log.d(TAG, "handleConnectToServerButtonClick: starting ServerIOTask and registering this Activity with Comm...");
 				Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
-				serverTask = new ServerTask();
-				serverTask.execute();
+				serverIOTask = new ServerIOTask();
+				serverIOTask.execute();
 			}
 		}
 	}
@@ -323,7 +317,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		hideSoftKeyboard();
 		String msg = mInputText.getText().toString();
 		SimpleMessage msgObj = new SimpleMessage(msg, false);
-		serverTask.sendOutgoingObject(msgObj);
+		serverIOTask.sendOutgoingObject(msgObj);
 	}
 
 	public void handleEchoMessageButtonClick(View view) throws IOException
@@ -332,7 +326,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		hideSoftKeyboard();
 		String msg = mInputText.getText().toString();
 		SimpleMessage msgObj = new SimpleMessage(msg, true);
-		serverTask.sendOutgoingObject(msgObj);
+		serverIOTask.sendOutgoingObject(msgObj);
 	}
 
 	public void handleClearInputTextButtonClick(View view) throws IOException
@@ -358,7 +352,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		Log.d(TAG, "handleGetAllPlayersButtonClick");
 		hideSoftKeyboard();
 		GetPlayerListRequest getPlayerListRequest = new GetPlayerListRequest(PlayerListType.ALL_UNMATCHED_PLAYERS);
-		serverTask.sendOutgoingObject(getPlayerListRequest);
+		serverIOTask.sendOutgoingObject(getPlayerListRequest);
 	}
 
 	public void handleGetOpponentsButtonClick(View view) throws IOException
@@ -373,7 +367,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		hideSoftKeyboard();
 		String msg = mInputText.getText().toString();
 		SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), msg);
-		serverTask.sendOutgoingObject(request);
+		serverIOTask.sendOutgoingObject(request);
 	}
 
 	public void handleAcceptOpponentButtonClick(View view) throws IOException
@@ -400,7 +394,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 			{
 				Log.d(TAG, "handleRequestToBecomeOpponent: accepting opponent request: " + Model.getSelectOpponentRequest());
 				response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), Model.getSelectOpponentRequest().getSourceUsername());
-				serverTask.sendOutgoingObject(response);
+				serverIOTask.sendOutgoingObject(response);
 			}
 		}
 		catch (Exception e)
@@ -417,7 +411,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		try
 		{
 			OpponentBoundMessage msgObj = new OpponentBoundMessage(msg, false);   // this constructor assumes the server handles figuring out who is the opponent for the msg destination
-			serverTask.sendOutgoingObject(msgObj);
+			serverIOTask.sendOutgoingObject(msgObj);
 		}
 		catch (Exception e)
 		{
@@ -436,7 +430,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		int rows = 5;   //TODO allow player selection of grid size
 		int cols = 5;   //TODO allow player selection of grid size
 		CreateGameRequest request = new CreateGameRequest(-1, Model.getUserLogin().getUserName(), "defaultGameType", rows, cols, false, -1, -1, Model.getOpponentUsername(), 9000);
-		serverTask.sendOutgoingObject(request);
+		serverIOTask.sendOutgoingObject(request);
 	}
 
 	public void handleSendMoveButtonClick(View view) throws IOException
@@ -446,7 +440,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		// generate a fake, unophisticated GameMove and send it in a request, without client validation.
 		GameMove gameMove = getGeneratedGameMove();
 		GameMoveRequest request = new GameMoveRequest(Model.getUserLogin().getUserName(), -1, gameMove);
-		serverTask.sendOutgoingObject(request);
+		serverIOTask.sendOutgoingObject(request);
 	}
 
 	public void handleSendScoreButtonClick(View view) throws IOException
@@ -461,7 +455,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 		hideSoftKeyboard();
 
 		EndGameRequest request = new EndGameRequest(Model.getUserLogin().getUserName(), -1);
-		serverTask.sendOutgoingObject(request);
+		serverIOTask.sendOutgoingObject(request);
 	}
 
 	/////////////////////////////////////////////////
@@ -543,7 +537,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "handleGameOver");
 		EndGameRequest request = new EndGameRequest(Model.getUserLogin().getUserName(), -1);
-		serverTask.sendOutgoingObject(request);
+		serverIOTask.sendOutgoingObject(request);
 	}
 
 
@@ -668,7 +662,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 	@Override
 	public void handleIncomingObject(Object obj)
 	{
-		Log.d(TAG, "handleIncomingObject forwarded from ServerTask: " + obj);
+		Log.d(TAG, "handleIncomingObject forwarded from ServerIOTask: " + obj);
 		updateUI();
 	}
 

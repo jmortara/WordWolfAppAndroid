@@ -18,11 +18,11 @@ import java.net.UnknownHostException;
 
 
 /**
- * ServerTask - AsyncTask which handles server connections and messaging
+ * ServerIOTask - AsyncTask which handles server connections and Input/Output of message objects.
  */
-public class ServerTask extends AsyncTask<Void, Integer, Integer>
+public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 {
-	public static final String TAG = "ServerTask";
+	public static final String TAG = "ServerIOTask";
 
 //	private Activity referenceActivity;		//TODO - remove? this stored Activity reference is handled by Comm now.
 	private Socket s;
@@ -30,9 +30,9 @@ public class ServerTask extends AsyncTask<Void, Integer, Integer>
 	private ObjectInputStream s_objIn;
 
 	// constructor
-	public ServerTask(/*Activity referenceActivity*/)
+	public ServerIOTask(/*Activity referenceActivity*/)
 	{
-		Log.d(TAG, "ServerTask constructor");
+		Log.d(TAG, "ServerIOTask constructor");
 //		this.referenceActivity = referenceActivity;
 	}
 

@@ -1,12 +1,9 @@
 package com.mortaramultimedia.wordwolfappandroid.communications;
 
-import android.os.AsyncTask;
-import android.os.Build;
 import android.util.Log;
 
 import com.mortaramultimedia.wordwolf.shared.messages.ConnectToDatabaseRequest;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
-import com.mortaramultimedia.wordwolfappandroid.database.DatabaseAsyncTask;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
 import java.io.IOException;
@@ -27,7 +24,7 @@ public class Comm
 
 	private static Comm instance = new Comm();		// Singleton instance
 
-	private static ServerTask serverTask = null;
+	private static ServerIOTask serverIOTask = null;
 	private static IExtendedAsyncTask currentActivity = null;
 
 
@@ -65,14 +62,14 @@ public class Comm
 		}
 
 		// Start network tasks separate from the main UI thread
-		if (serverTask == null && !Model.getConnected())
+		if (serverIOTask == null && !Model.getConnected())
 		{
-			serverTask = new ServerTask();
-			serverTask.execute();
+			serverIOTask = new ServerIOTask();
+			serverIOTask.execute();
 		}
 		else
 		{
-			Log.d(TAG, "connectToServer: not connected and serverTask is null.");
+			Log.d(TAG, "connectToServer: not connected and serverIOTask is null.");
 		}
 	}
 
@@ -133,7 +130,7 @@ public class Comm
 	}
 
 	/**
-	 * Forward the incoming object from the server (which should be coming from serverTask) to the currently registered Activity.
+	 * Forward the incoming object from the server (which should be coming from serverIOTask) to the currently registered Activity.
 	 * @param obj
 	 */
 	public static void handleIncomingObject(Object obj)
