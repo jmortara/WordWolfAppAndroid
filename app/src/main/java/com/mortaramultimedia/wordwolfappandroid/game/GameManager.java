@@ -138,7 +138,7 @@ public class GameManager
 
 	public static void printValidWordsThisGame()
 	{
-		Log.d( TAG, "printValidWordsThisGame: foundWords: " + Model.getValidWordsThisGame().toString() );		//TODO: store found words locally? or on server? both?
+		Log.d( TAG, "printValidWordsThisGame: foundWords: " + Model.getValidWordsThisGame().toString() );
 	}
 
 	public static boolean checkWordValidity()
@@ -147,7 +147,7 @@ public class GameManager
 
 		Boolean isValid = false;
 		String submittedWord = getWordSoFar().toLowerCase();
-		HashMap<String, String> dict = Model.getClientDictionary();
+		ArrayList<String> dict = Model.getClientDictionary();
 
 		if ( submittedWord.length() == 0 )
 		{
@@ -164,12 +164,12 @@ public class GameManager
 			Log.w( TAG, "checkWordValidity: client dictionary is empty" );
 			isValid =  false;
 		}
-		else if ( !dict.containsValue( submittedWord ) )
+		else if ( !dict.contains( submittedWord ) )
 		{
 			Log.d( TAG, "checkWordValidity: word not found in client dictionary: " + submittedWord );
 			isValid = false;
 		}
-		else if ( dict.containsValue( submittedWord ) )
+		else if ( dict.contains( submittedWord ) )
 		{
 			Log.d( TAG, "checkWordValidity: FOUND: " + submittedWord );
 			isValid = true;

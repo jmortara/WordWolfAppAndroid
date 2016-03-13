@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -61,12 +62,12 @@ public class MainActivity extends Activity {
 	{
 		Log.d(TAG, "populateDictionary");
 
-		statusText.setText( getResources().getString(R.string.loading_dictionary));
+		statusText.setText(getResources().getString(R.string.loading_dictionary));
 
-		Model.setClientDictionary( new HashMap<String, String>() );
-		Log.d( TAG, "populateDictionary: clientDictionary length before load: " + Model.getClientDictionary().size() );
+		Model.setClientDictionary( new ArrayList<String>() );
+		Log.d(TAG, "populateDictionary: clientDictionary length before load: " + Model.getClientDictionary().size());
 
-		Model.setClientDictionary( loadDictionary(this) );
+		Model.setClientDictionary(loadDictionary(this));
 		Log.d( TAG, "populateDictionary: clientDictionary length after load:  " + Model.getClientDictionary().size() );
 		statusText.setText(getResources().getString(R.string.loaded_dictionary) + " " + Model.getClientDictionary().size() + " words. ");
 		setStartButtonVisibility(View.VISIBLE);
@@ -79,11 +80,11 @@ public class MainActivity extends Activity {
 	}
 
 	//TODO: move to game
-	public static HashMap<String, String> loadDictionary(Context context)
+	public static ArrayList<String> loadDictionary(Context context)
 	{
 		Log.d(TAG, "loadDictionary");
 
-		HashMap<String, String> myDict = new HashMap<String, String>();
+		ArrayList<String>myDict = new ArrayList<String>();
 		AssetManager assetManager = context.getAssets();
 		String line;
 		int currentLine = 0;
@@ -93,7 +94,7 @@ public class MainActivity extends Activity {
 			BufferedReader r = new BufferedReader(new InputStreamReader(ims));
 			try {
 				while ((line=r.readLine()) != null) {
-					myDict.put(line, line);
+					myDict.add(line);
 					if ( currentLine <= lastLineToPrint)
 					{
 						Log.d(TAG, "read line: " + line);

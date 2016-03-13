@@ -43,7 +43,7 @@ public class Model
 	private static ArrayList<TileData> selectedTiles;
 	private static ArrayList<String> validWordsThisGame;
 	private static HashSet<GameMove> gameMovesThisGame;
-	private static HashMap<String, String> clientDictionary;
+	private static ArrayList<String> clientDictionary;
 
 	// DEBUG SETTINGS
 	public static final Boolean DEV_DEBUG_MODE          = false;			// custom debug flag for developer use
@@ -212,12 +212,12 @@ public class Model
 		Model.score = score;
 	}
 
-	public static HashMap<String, String> getClientDictionary()
+	public static ArrayList<String> getClientDictionary()
 	{
 		return clientDictionary;
 	}
 
-	public static void setClientDictionary(HashMap<String, String> clientDictionary)
+	public static void setClientDictionary(ArrayList<String> clientDictionary)
 	{
 		Model.clientDictionary = clientDictionary;
 	}
