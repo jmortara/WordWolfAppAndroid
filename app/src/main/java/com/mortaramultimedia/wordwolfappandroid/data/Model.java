@@ -6,7 +6,9 @@ import com.mortaramultimedia.wordwolf.shared.messages.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 
 /**
@@ -38,9 +40,10 @@ public class Model
 	private static Integer score 				= 0;
 
 	// moved from old single-player Model
-	public static ArrayList<TileData> selectedTiles;
-	public static ArrayList<String> validWordsThisGame;
-	public static HashMap<String, String> clientDictionary;
+	private static ArrayList<TileData> selectedTiles;
+	private static ArrayList<String> validWordsThisGame;
+	private static HashSet<GameMove> gameMovesThisGame;
+	private static HashMap<String, String> clientDictionary;
 
 	// DEBUG SETTINGS
 	public static final Boolean DEV_DEBUG_MODE          = false;			// custom debug flag for developer use
@@ -207,6 +210,46 @@ public class Model
 	public static void setScore(Integer score)
 	{
 		Model.score = score;
+	}
+
+	public static HashMap<String, String> getClientDictionary()
+	{
+		return clientDictionary;
+	}
+
+	public static void setClientDictionary(HashMap<String, String> clientDictionary)
+	{
+		Model.clientDictionary = clientDictionary;
+	}
+
+	public static ArrayList<TileData> getSelectedTiles()
+	{
+		return selectedTiles;
+	}
+
+	public static void setSelectedTiles(ArrayList<TileData> selectedTiles)
+	{
+		Model.selectedTiles = selectedTiles;
+	}
+
+	public static HashSet<GameMove> getGameMovesThisGame()
+	{
+		return gameMovesThisGame;
+	}
+
+	public static void setGameMovesThisGame(HashSet<GameMove> gameMovesThisGame)
+	{
+		Model.gameMovesThisGame = gameMovesThisGame;
+	}
+
+	public static ArrayList<String> getValidWordsThisGame()
+	{
+		return validWordsThisGame;
+	}
+
+	public static void setValidWordsThisGame(ArrayList<String> validWordsThisGame)
+	{
+		Model.validWordsThisGame = validWordsThisGame;
 	}
 
 

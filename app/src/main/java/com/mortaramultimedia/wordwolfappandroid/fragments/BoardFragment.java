@@ -352,7 +352,7 @@ public class BoardFragment extends Fragment {
 	{
 		Log.d( TAG, "updateLetterButtonColor: " + type);
 
-		if(Model.selectedTiles.size() == 0 || (Model.selectedTiles.size() > 0 && GameManager.isValidTileSelection(td)))
+		if(Model.getSelectedTiles().size() == 0 || (Model.getSelectedTiles().size() > 0 && GameManager.isValidTileSelection(td)))
 		{
 			Log.d( TAG, "VALID TILE SELECTION" );
 

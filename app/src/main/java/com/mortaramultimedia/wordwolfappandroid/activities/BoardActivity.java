@@ -23,6 +23,7 @@ import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by Jason Mortara on 11/15/14.
@@ -70,7 +71,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	private void initGameData()
 	{
 		Log.d(TAG, "initGameData");
-		Model.validWordsThisGame = new ArrayList<String>();
+		Model.setValidWordsThisGame( new ArrayList<String>() );
+		Model.setGameMovesThisGame( new HashSet<GameMove>() );
 	}
 
 
@@ -144,22 +146,34 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 
 	public void handleSubmitWordButtonClick(View view)
 	{
-		Log.d(TAG, "handleSubmitWordButtonClick");
+		//Log.d(TAG, "handleSubmitWordButtonClick");
 
 		// submit the word for comparison with dictionary and increment score if nec
 		Boolean wordIsValid = GameManager.checkWordValidity();
-		if ( wordIsValid )
+		if(wordIsValid)
 		{
-			// client
-			Model.validWordsThisGame.add( GameManager.getWordSoFar() );
-			GameManager.printValidWordsThisGame();
-
-			// server: put a copy of the sequence of TileData stored in the Model
-			// into a GameMove obj and send out for server-side validation
-			ArrayList<TileData> selectedTilesCopy = new ArrayList<TileData>(Model.selectedTiles);
+			ArrayList<TileData> selectedTilesCopy = new ArrayList<TileData>(Model.getSelectedTiles());
 			GameMove gameMove = new GameMove(selectedTilesCopy);
-			GameMoveRequest request = new GameMoveRequest(Model.getUserLogin().getUserName(), -1, gameMove);
-			Comm.sendObject(request);
+
+			// make sure the same exact move can't be submitted twice (although the same word made with different TileDatas is OK)
+			Boolean gameMoveIsUnique = Model.getGameMovesThisGame().add(gameMove);					// add to the Set in the Model. If trying to add a dupe, will not add, and return false.
+			Log.d(TAG, "handleSubmitWordButtonClick: is gameMove unique? hashcode? total # of moves made? " + gameMoveIsUnique + ", " + gameMove.hashCode() + ", " + Model.getGameMovesThisGame().size());
+
+			if(gameMoveIsUnique)
+			{
+				// client
+				Model.getValidWordsThisGame().add(GameManager.getWordSoFar());
+				GameManager.printValidWordsThisGame();
+
+				// server: put a copy of the sequence of TileData stored in the Model
+				// into a GameMove obj and send out for server-side validation
+				GameMoveRequest request = new GameMoveRequest(Model.getUserLogin().getUserName(), -1, gameMove);
+				Comm.sendObject(request);
+			}
+			else
+			{
+				Log.w(TAG, "handleSubmitWordButtonClick: This move has already been played. Ignoring. " + gameMove);
+			}
 		}
 
 		// reset the word and the word display

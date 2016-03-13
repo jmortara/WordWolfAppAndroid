@@ -3,11 +3,13 @@ package com.mortaramultimedia.wordwolfappandroid.game;
 import android.app.Activity;
 import android.util.Log;
 
+import com.mortaramultimedia.wordwolf.shared.messages.GameMove;
 import com.mortaramultimedia.wordwolf.shared.messages.TileData;
 
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class GameManager
@@ -32,16 +34,16 @@ public class GameManager
 		Log.d( TAG, "startNewWord" );
 
 		// reset all TileData to default state
-		if(Model.selectedTiles != null && Model.selectedTiles.size() > 0)
+		if(Model.getSelectedTiles() != null && Model.getSelectedTiles().size() > 0)
 		{
-			for(TileData td : Model.selectedTiles)
+			for(TileData td : Model.getSelectedTiles())
 			{
 				td.setSelected(false);
 			}
 		}
 
 		// start a new list of TileDatas for a new word
-		Model.selectedTiles = new ArrayList<TileData>();
+		Model.setSelectedTiles(new ArrayList<TileData>());
 	}
 
 	public static void processTileSelection( TileData td )
@@ -50,9 +52,9 @@ public class GameManager
 		Log.d( TAG, "processTileSelection: " +  td.toString() + ": " + c);
 
 		// first selected tile
-		if ( Model.selectedTiles.size() == 0 )
+		if ( Model.getSelectedTiles().size() == 0 )
 		{
-			Model.selectedTiles.add(td);
+			Model.getSelectedTiles().add(td);
 		}
 		else
 		{
@@ -73,7 +75,7 @@ public class GameManager
 	{
 		Log.d(TAG, "handleValidTileSelection: move is ok");
 		td.setSelected(true);
-		Model.selectedTiles.add(td);
+		Model.getSelectedTiles().add(td);
 	}
 
 	private static void handleInvalidTileSelection()
@@ -83,7 +85,7 @@ public class GameManager
 
 	public static Boolean isValidTileSelection( TileData td )
 	{
-		TileData lastTileSelected = Model.selectedTiles.get( Model.selectedTiles.size() - 1 );
+		TileData lastTileSelected = Model.getSelectedTiles().get(Model.getSelectedTiles().size() - 1);
 		Boolean sameCol = ( td.getCol() == lastTileSelected.getCol() );
 		Boolean sameRow = ( td.getRow() == lastTileSelected.getRow() );
 		Boolean adjCol  = ( Math.abs( td.getCol() - lastTileSelected.getCol() ) == 1 );
@@ -118,9 +120,9 @@ public class GameManager
 	{
 		String str = "";
 		Character c = 'g';
-		if ( Model.selectedTiles != null && Model.selectedTiles.size() > 0 )
+		if ( Model.getSelectedTiles() != null && Model.getSelectedTiles().size() > 0 )
 		{
-			for (TileData td : Model.selectedTiles)
+			for (TileData td : Model.getSelectedTiles())
 			{
 				c = getLetterAtPosition(td);
 				str += c;
@@ -136,7 +138,7 @@ public class GameManager
 
 	public static void printValidWordsThisGame()
 	{
-		Log.d( TAG, "printValidWordsThisGame: foundWords: " + Model.validWordsThisGame.toString() );		//TODO: store found words locally? or on server? both?
+		Log.d( TAG, "printValidWordsThisGame: foundWords: " + Model.getValidWordsThisGame().toString() );		//TODO: store found words locally? or on server? both?
 	}
 
 	public static boolean checkWordValidity()
@@ -145,28 +147,29 @@ public class GameManager
 
 		Boolean isValid = false;
 		String submittedWord = getWordSoFar().toLowerCase();
+		HashMap<String, String> dict = Model.getClientDictionary();
 
 		if ( submittedWord.length() == 0 )
 		{
 			Log.w( TAG, "checkWordValidity: word string is empty" );
 			isValid =  false;
 		}
-		else if( Model.clientDictionary == null )
+		else if( dict == null )
 		{
 			Log.w( TAG, "checkWordValidity: client dictionary is null" );
 			isValid =  false;
 		}
-		else if ( Model.clientDictionary.size() == 0 )
+		else if ( dict.size() == 0 )
 		{
 			Log.w( TAG, "checkWordValidity: client dictionary is empty" );
 			isValid =  false;
 		}
-		else if ( !Model.clientDictionary.containsValue( submittedWord ) )
+		else if ( !dict.containsValue( submittedWord ) )
 		{
 			Log.d( TAG, "checkWordValidity: word not found in client dictionary: " + submittedWord );
 			isValid = false;
 		}
-		else if ( Model.clientDictionary.containsValue( submittedWord ) )
+		else if ( dict.containsValue( submittedWord ) )
 		{
 			Log.d( TAG, "checkWordValidity: FOUND: " + submittedWord );
 			isValid = true;

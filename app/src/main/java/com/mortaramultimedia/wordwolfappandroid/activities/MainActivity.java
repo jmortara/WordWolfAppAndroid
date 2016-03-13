@@ -63,12 +63,12 @@ public class MainActivity extends Activity {
 
 		statusText.setText( getResources().getString(R.string.loading_dictionary));
 
-		Model.clientDictionary = new HashMap<String, String>();
-		Log.d( TAG, "populateDictionary: clientDictionary length before load: " + Model.clientDictionary.size() );
+		Model.setClientDictionary( new HashMap<String, String>() );
+		Log.d( TAG, "populateDictionary: clientDictionary length before load: " + Model.getClientDictionary().size() );
 
-		Model.clientDictionary = loadDictionary(this);
-		Log.d( TAG, "populateDictionary: clientDictionary length after load:  " + Model.clientDictionary.size() );
-		statusText.setText(getResources().getString(R.string.loaded_dictionary) + " " + Model.clientDictionary.size() + " words. ");
+		Model.setClientDictionary( loadDictionary(this) );
+		Log.d( TAG, "populateDictionary: clientDictionary length after load:  " + Model.getClientDictionary().size() );
+		statusText.setText(getResources().getString(R.string.loaded_dictionary) + " " + Model.getClientDictionary().size() + " words. ");
 		setStartButtonVisibility(View.VISIBLE);
 
 		// EditText editText = (EditText) findViewById(R.id.dictEditText);
