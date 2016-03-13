@@ -277,9 +277,14 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		final long TOAST_DURATION_MS	= 500;
 		final int TOAST_OFFSET_X		= 0;
 		final int TOAST_OFFSET_Y 		= 65;
+		final int TOAST_BG_COLOR		= getResources().getColor(R.color.wordwolf_toast_color_light_green);
 
 		final Toast playerWordToast = Toast.makeText(BoardActivity.this, wordSubmitted + ": " + pointsAwarded, Toast.LENGTH_SHORT);
 		playerWordToast.setGravity(Gravity.TOP | Gravity.CENTER, TOAST_OFFSET_X, TOAST_OFFSET_Y);
+
+		View toastView = playerWordToast.getView();
+		toastView.setBackgroundColor(TOAST_BG_COLOR);
+
 		playerWordToast.show();
 
 		Handler handler = new Handler();

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="wordwolf_button_color_blue_up">#8FADE5</color>
+    <color name="wordwolf_toast_color_light_green">#1DC41D</color>
 
     <color name="white">#FFFFFF</color>
     <color name="yellow">#FFFF00</color>
