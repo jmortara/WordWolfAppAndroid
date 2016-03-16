@@ -2,15 +2,16 @@ package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,9 +22,12 @@ import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
 import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
+import com.mysql.jdbc.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Jason Mortara on 11/15/14.
@@ -32,9 +36,18 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 {
 
 	private static final String TAG = "BoardActivity";
-	private TextView wordSoFarText;
-	private TextView scoreText;
+
+	// views
+	private ImageView mGameTimerForeground;
+	private TextView mWordSoFarText;
+	private TextView mScoreText;
+	private TextView mTimerText;
+	private int gameTimerFGOrigWidth;
+
 	BoardFragment boardFragment = null;
+	Timer gameTimer = null;
+	TimerTask gameTimerTask = null;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +57,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 		init();
 	}
+
+
 
 	@Override
 	protected void onResume()
@@ -63,6 +78,7 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	private void init() {
 		Log.d(TAG, "init");
 
+
 		initGameData();
 		setupBoard();
 		startGameTimer();
@@ -79,8 +95,10 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	private void setupBoard()
 	{
 		Log.d(TAG, "setupBoard");
-		wordSoFarText 	= (TextView) findViewById(R.id.wordSoFarText);
-		scoreText 		= (TextView) findViewById(R.id.scoreText);
+		mWordSoFarText 			= (TextView) 	findViewById(R.id.wordSoFarText);
+		mScoreText 				= (TextView) 	findViewById(R.id.scoreText);
+		mTimerText 				= (TextView) 	findViewById(R.id.timerText);
+		mGameTimerForeground 	= (ImageView) 	findViewById(R.id.gameTimerForeground);
 	}
 
 
@@ -94,14 +112,73 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	 */
 	private void startGameTimer()
 	{
-		Log.d(TAG, "startGameTimer *************************");
+		Log.d(TAG, "startGameTimer for duration (ms): " + Model.getGameDurationMS());
 
-		new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+		final int GREEN 	= Color.rgb(26, 219, 62);
+		final int YELLOW 	= Color.rgb(219, 203, 26);
+		final int RED 		= Color.rgb(219, 26, 26);
+		final long duration = Model.getGameDurationMS();
+		final int MIN_WIDTH = 1;
+		final int ORIG_WIDTH = mGameTimerForeground.getLayoutParams().width;		//TODO - get dynamically after layout inflated
+		final Integer decrement = ORIG_WIDTH / 60;									//TODO - calculate dynamically e.g. ORIG_WIDTH / (int) (long) Model.getGameDurationMS();
+		final Handler gameTimerHandler = new Handler();
+
+		mTimerText.setText(Long.toString(duration/1000));
+		mGameTimerForeground.setColorFilter(GREEN, android.graphics.PorterDuff.Mode.MULTIPLY);
+
+		gameTimerHandler.postDelayed(new Runnable()
+		{
+			long timeElapsedMS = 0;
+			long timeRemaingSecs = duration;
+			String timeElapsedTensStr = "";
+
 			@Override
-			public void run() {
-				handleGameOver();
+			public void run()
+			{
+				timeElapsedMS += 1000;
+				if(timeElapsedMS < duration)
+				{
+					if(mGameTimerForeground.getLayoutParams().width > MIN_WIDTH)
+					{
+						//Log.d(TAG, "gameTimer going for... " + timeElapsedMS);
+
+						gameTimerHandler.postDelayed(this, 1000);
+						mGameTimerForeground.getLayoutParams().width -= decrement;
+						timeRemaingSecs = (duration - timeElapsedMS)/1000;
+
+						// color indicator as time runs low
+						if(timeElapsedMS > duration * 0.80)
+						{
+							mGameTimerForeground.setColorFilter(RED, android.graphics.PorterDuff.Mode.MULTIPLY);
+						}
+						else if (timeElapsedMS > duration * 0.60)
+						{
+							mGameTimerForeground.setColorFilter(YELLOW, android.graphics.PorterDuff.Mode.MULTIPLY);
+						}
+						else if(timeElapsedMS > 0)
+						{
+							mGameTimerForeground.setColorFilter(GREEN, android.graphics.PorterDuff.Mode.MULTIPLY);
+						}
+
+						// set timer text, seconds remaining
+						if(timeRemaingSecs < 10)
+						{
+							timeElapsedTensStr = "0";		// tens place zero when needed
+						}
+						mTimerText.setText(":" + timeElapsedTensStr + Long.toString(timeRemaingSecs));
+						mGameTimerForeground.requestLayout();
+
+						//Log.d(TAG, "gameTimer decrement, new width: " + decrement + ", " + mGameTimerForeground.getLayoutParams().width);
+					}
+				}
+				// when time elapsed hits the limit of the game duration, it's game over
+				else
+				{
+					gameTimerHandler.removeCallbacks(this);
+					handleGameOver();
+				}
 			}
-		}, Model.getGameDurationMS());	// end new Handler
+		}, 1000);	// delay, ms
 	}
 
 
@@ -119,6 +196,11 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	}*/
 
 
+
+
+
+
+
 	////////////////////////////////
 	//
 	public void handleBoardFragmentButtonClick(View view)	//TODO: remove? unused.
@@ -129,9 +211,9 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	public void updateWordDisplay()
 	{
 		Log.d(TAG, "updateWordDisplay");
-		if ( wordSoFarText != null )
+		if ( mWordSoFarText != null )
 		{
-			wordSoFarText.setText( getResources().getString(R.string.word_so_far) + GameManager.getWordSoFar() );
+			mWordSoFarText.setText( getResources().getString(R.string.word_so_far) + GameManager.getWordSoFar() );
 		}
 	}
 
@@ -140,8 +222,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		Log.d(TAG, "updateScoreDisplay");
 		Integer newScore = Model.getScore();	//Integer.valueOf(Model.validWordsThisGame.size());
 		String newScoreStr = newScore.toString();
-		scoreText.setText(newScoreStr);
-//		scoreText.setText(getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size());
+		mScoreText.setText(newScoreStr);
+//		mScoreText.setText(getResources().getString(R.string.score) + " " + Model.validWordsThisGame.size());
 	}
 
 	public void handleSubmitWordButtonClick(View view)

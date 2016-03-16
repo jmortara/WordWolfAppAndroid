@@ -53,6 +53,7 @@
             <TextView
                 android:id="@+id/scoreText"
                 android:text="0"
+                android:textColor="@color/DarkGreen"
                 android:textSize="@dimen/abc_text_size_headline_material"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -77,7 +78,25 @@
 
     </LinearLayout>
 
-    <TextView
+    <ImageView
+        android:id="@+id/gameTimerForeground"
+        android:layout_width="120dp"
+        android:layout_height="7dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="4dp"
+        android:src="@drawable/board_game_timer_foreground"
+        android:layout_gravity="right"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
         android:id="@+id/wordSoFarText"
         android:text="@string/word_so_far"
         android:textSize="@dimen/abc_text_size_headline_material"
@@ -86,8 +105,25 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
+        android:layout_weight="0.99"
+        android:layout_gravity="left"
         />
 
+        <TextView
+            android:id="@+id/timerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":00"
+            android:textAlignment="gravity"
+            android:textSize="@dimen/abc_text_size_body_2_material"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="0.01"
+            android:layout_gravity="right"
+            />
+
+    </LinearLayout>
 
     <fragment
         android:id="@+id/boardFragment"
