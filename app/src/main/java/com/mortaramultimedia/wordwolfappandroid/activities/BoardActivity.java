@@ -22,12 +22,9 @@ import com.mortaramultimedia.wordwolfappandroid.fragments.BoardFragment;
 import com.mortaramultimedia.wordwolfappandroid.game.GameManager;
 import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
-import com.mysql.jdbc.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Jason Mortara on 11/15/14.
@@ -42,11 +39,8 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 	private TextView mWordSoFarText;
 	private TextView mScoreText;
 	private TextView mTimerText;
-	private int gameTimerFGOrigWidth;
 
 	BoardFragment boardFragment = null;
-	Timer gameTimer = null;
-	TimerTask gameTimerTask = null;
 
 
 	@Override
@@ -57,8 +51,6 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 		init();
 	}
-
-
 
 	@Override
 	protected void onResume()
@@ -75,9 +67,9 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 		// do nothing
 	}
 
-	private void init() {
+	private void init()
+	{
 		Log.d(TAG, "init");
-
 
 		initGameData();
 		setupBoard();
@@ -180,24 +172,6 @@ public class BoardActivity extends Activity implements BoardFragment.OnFragmentI
 			}
 		}, 1000);	// delay, ms
 	}
-
-
-	/**
-	 * Handle the completion of the game timer. Ths should trigger a Game Over sequence.
-	 */
-	/*private void handleGameTimerCompleted()
-	{
-		Log.d(TAG, "handleGameTimerCompleted");
-		if(gameTimer != null)
-		{
-			gameTimer.cancel();
-		}
-		handleGameOver();
-	}*/
-
-
-
-
 
 
 

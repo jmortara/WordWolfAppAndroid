@@ -5,10 +5,8 @@ import android.util.Log;
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 
 /**
@@ -53,17 +51,17 @@ public class Model
 
 	/**
 	 * Get the host IP used for connection to WordWolf Server. Could be the remote server, or the local machine IP.
-	 * @return
+	 * @return Host IP
 	 */
 	public static String getHostIP()
 	{
-		String host = null;
+		String host;
 		if(!DEV_DEBUG_USE_LOCAL_IP)
 		{
 			host = HOST;
 			Log.d(TAG, "getHostIP: using host: " + host);
 		}
-		else if(DEV_DEBUG_USE_LOCAL_IP)
+		else
 		{
 			host = DEV_DEBUG_LOCAL_IP_ADDR;
 			Log.w(TAG, "getHostIP: *****using local machine host******: " + host);

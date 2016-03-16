@@ -47,7 +47,7 @@
 			/>
 
 		<TextView
-			android:text="        vs."
+			android:text="  vs."
 			android:editable="false"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"

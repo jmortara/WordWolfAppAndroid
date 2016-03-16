@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mortaramultimedia.wordwolf.shared.messages.*;
 
@@ -24,9 +26,9 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 {
 	public static final String TAG = "GameSetupActivity";
 
-	TextView usernameText;
-	TextView opponentUsernameText;
-	ImageButton playButton;
+	private TextView mUsernameText;
+	private TextView mOpponentUsernameText;
+	private ImageButton mPlayButton;
 
 
 	@Override
@@ -49,6 +51,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Log.d(TAG, "onResume");
 		super.onResume();
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+		updateUI();
 	}
 
 	@Override
@@ -64,9 +67,10 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	private void createUIReferences()
 	{
 		Log.d(TAG, "createUIReferences");
-		usernameText 					= (TextView) 	findViewById(R.id.usernameText);
-		opponentUsernameText 			= (TextView) 	findViewById(R.id.opponentUsernameText);
-		playButton 						= (ImageButton) findViewById(R.id.playButton);
+
+		mUsernameText 			= (TextView) 	findViewById(R.id.usernameText);
+		mOpponentUsernameText 	= (TextView) 	findViewById(R.id.opponentUsernameText);
+		mPlayButton 			= (ImageButton) findViewById(R.id.playButton);
 	}
 
 	/**
@@ -76,13 +80,40 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "updateUI");
 
-		usernameText.setText(Model.getUserLogin().getUserName());
-		opponentUsernameText.setText(Model.getOpponentUsername());
+		mUsernameText.setText(Model.getUserLogin().getUserName());
+		mOpponentUsernameText.setText(Model.getOpponentUsername());
+
+		updatePlayButtonVisibility();
+	}
+
+	/**
+	 * Update the visibility of the Play button. Only one client should see it so that multiple start games are not initiated.
+	 * Note that the client initiating a SelectOpponentRequest would not have stored the request in the Model; only the receiving client stores it.
+	 */
+	private void updatePlayButtonVisibility()
+	{
+		if(Model.getSelectOpponentRequest() == null)
+		{
+			Log.w(TAG, "updatePlayButtonVisibility: Model.getSelectOpponentRequest() is null... hiding Play button so opponent can start the game.");
+			mPlayButton.setVisibility(View.INVISIBLE);
+			showWaitingForOpponentToast();
+		}
+		else if(Model.getSelectOpponentRequest().getSourceUsername().equals(Model.getUserLogin().getUserName()))
+		{
+			Log.d(TAG, "updatePlayButtonVisibility: this client initiated the SelectOpponentRequest... hiding Play button so opponent can start the game.");
+			mPlayButton.setVisibility(View.INVISIBLE);
+			showWaitingForOpponentToast();
+		}
+		else if(Model.getSelectOpponentRequest().getDestinationUserName().equals(Model.getUserLogin().getUserName()))
+		{
+			Log.d(TAG, "updatePlayButtonVisibility: this client received the SelectOpponentRequest... showing Play button on this client (and hiding on opponent's client)");
+			mPlayButton.setVisibility(View.VISIBLE);
+		}
 	}
 
 	/**
 	 * Handle the PLAY button press by sending a new CreateGameRequest.
-	 * @param view
+	 * @param view view
 	 * @throws IOException
 	 */
 	public void handlePlayButtonClick(View view) throws IOException
@@ -94,12 +125,20 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Comm.sendObject(request);
 	}
 
+	private void showWaitingForOpponentToast() {
+		Log.d(TAG, "showWaitingForOpponentToast");
+
+		final Toast waitingToast = Toast.makeText(this, "Waiting for " + Model.getOpponentUsername() + " to start the game, one moment...", Toast.LENGTH_LONG);
+		waitingToast.setGravity(Gravity.CENTER, 0, 0);
+		waitingToast.show();
+	}
+
 	/////////////////////////////////////
 	// IExtendedAsyncTask overrides
 	@Override
 	public void onTaskCompleted()
 	{
-
+		Log.d(TAG, "onTaskCompleted");
 	}
 
 	@Override
