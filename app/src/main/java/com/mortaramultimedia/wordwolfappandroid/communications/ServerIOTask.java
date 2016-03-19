@@ -12,6 +12,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -82,6 +83,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 				{
 					e1.printStackTrace();
 				}
+
 				try
 				{
 					s_objIn.close();
@@ -94,6 +96,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 				{
 					e1.printStackTrace();
 				}
+
 				try
 				{
 					s.close();
@@ -101,6 +104,14 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 				catch (IOException e1)
 				{
 					e1.printStackTrace();
+				}
+			}
+			catch(ConnectException e)
+			{
+				Log.e(TAG, "ConnectException: " + e.getMessage());
+				if(Model.DEV_DEBUG_USE_LOCAL_IP)
+				{
+					Log.e(TAG, "Can't connect to IP. Check that actual IP is same as one defined in Model. Model.DEV_DEBUG_LOCAL_IP_ADDR is " + Model.DEV_DEBUG_LOCAL_IP_ADDR);
 				}
 			}
 			catch (SecurityException e)
@@ -192,7 +203,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 
 
 		// other stuff? close?
-		Log.d(TAG, "Continuing...");
+		Log.d(TAG, "Continuing... attempting to close I/O streams...");
 		if (s_objOut != null)
 		{
 			try

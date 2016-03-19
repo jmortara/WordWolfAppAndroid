@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.constants.*;
 import com.mortaramultimedia.wordwolf.shared.messages.*;
@@ -19,9 +20,12 @@ import com.mortaramultimedia.wordwolfappandroid.R;
 import com.mortaramultimedia.wordwolfappandroid.communications.Comm;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
+import com.mortaramultimedia.wordwolfappandroid.layout.array_adapters.PublicPlayerDataListAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import data.PublicPlayerData;
 
 
 public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTask
@@ -29,8 +33,12 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	public static final String TAG = "ChooseOpponentActivity";
 
 	// UI refs
+	private TextView chooseOpponentTitle;
 	private ListView opponentsListView;
-	private ArrayAdapter<String> playersAdapter;
+	private PublicPlayerDataListAdapter playersAdapter;
+
+	// data
+	private ArrayList<PublicPlayerData> playersList;
 
 	// dialog
 	private AlertDialog selectOpponentRequestDialog = null;
@@ -43,10 +51,12 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		setContentView(R.layout.activity_choose_opponent);
 
 		createUIReferences();
-		createUIListeners();
+		initListView();
+
 		updateUI();
 
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+
 		requestPlayerList();
 	}
 
@@ -73,23 +83,47 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	private void createUIReferences()
 	{
 		Log.d(TAG, "createUIReferences");
-		opponentsListView 		= (ListView) 	findViewById(R.id.opponentsListView);
+		chooseOpponentTitle = (TextView) findViewById(R.id.chooseOpponentTitle);
 	}
 
+	/**
+	 * Init the ListView for displaying opponents.
+	 */
+	private void initListView()
+	{
+		Log.d(TAG, "initListView");
+
+		playersList = new ArrayList<PublicPlayerData>();
+		playersAdapter = new PublicPlayerDataListAdapter(this, R.layout.public_player_data_list_adapter, playersList, R.id.listTitleText);
+		opponentsListView = (ListView) findViewById(R.id.opponentsListView);
+		opponentsListView.setAdapter(playersAdapter);
+
+		createUIListeners();
+	}
+
+	/**
+	 * Create the click listeners for items in the opponents ListView.
+	 */
 	private void createUIListeners()
 	{
 		Log.d(TAG, "createUIListeners");
 
 		// Opponents List item click listener
-		opponentsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				final String opponentName = (String) parent.getItemAtPosition(position);
-				Log.d(TAG, "Opponent List Item Click Listener: opponent list item clicked: " + opponentName);
-				SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentName);
-				Comm.sendObject(request);
-			}
-		});
+		if (opponentsListView != null)
+		{
+			opponentsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+			{
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+				{
+					Log.d(TAG, "Opponent List Item Click Listener: position clicked: " + position);
+					final PublicPlayerData opponentPlayerData = (PublicPlayerData) parent.getItemAtPosition(position);
+					Log.d(TAG, "Opponent List Item Click Listener: opponent list item clicked (position), opponentName: (" + position + ") " + opponentPlayerData.getUsername());
+					SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentPlayerData.getUsername());
+					Comm.sendObject(request);
+				}
+			});
+		}
 	}
 
 	/**
@@ -98,6 +132,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	private void updateUI()
 	{
 		Log.d(TAG, "updateUI");
+		chooseOpponentTitle.setText("Choose Opponent, " + Model.getUserLogin().getUserName());
 	}
 
 	public void handleRefreshOpponentsListButtonClick(View view) throws IOException
@@ -113,6 +148,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	{
 		Log.d(TAG, "requestPlayerList");
 
+		playersAdapter.clear();
 		GetPlayerListRequest request = new GetPlayerListRequest(PlayerListType.ALL_UNMATCHED_PLAYERS);
 		Comm.sendObject(request);
 	}
@@ -168,12 +204,11 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		}
 	}
 
-
 	private void handleGetPlayerListResponse(GetPlayerListResponse response)
 	{
 		Log.d(TAG, "handleGetPlayerListResponse: " + response);
 
-		ArrayList<String> playersList = (response.getPlayersCopy());
+		playersList = response.getPlayersCopy();
 
 		if(playersList != null)
 		{
@@ -187,8 +222,11 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 				Log.w(TAG, "handleGetPlayerListResponse: WARNING: empty players list. UI may show no avail opponents.");
 			}
 
-			playersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, playersList);
-			opponentsListView.setAdapter(playersAdapter);
+//			playersAdapter = new ArrayAdapter<PublicPlayerData>(this, R.layout.public_player_data_list_adapter, playersList);
+//			opponentsListView.setAdapter(playersAdapter);
+
+			playersAdapter.playersList = this.playersList;
+			playersAdapter.notifyDataSetChanged();
 		}
 		else
 		{

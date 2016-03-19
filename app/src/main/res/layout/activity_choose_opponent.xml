@@ -15,6 +15,7 @@
 
 
 		<TextView
+			android:id="@+id/chooseOpponentTitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="10dp"
@@ -29,8 +30,19 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Refresh"
-			android:layout_weight=".05"
+			android:layout_weight=".03"
 			android:onClick="handleRefreshOpponentsListButtonClick"
+			/>
+
+		<TextView
+			android:id="@+id/listTitleText"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:text="Player                      High Score      Total Score"
+			android:textSize="16sp"
+			android:layout_weight=".02"
+			android:paddingBottom="10dp"
 			/>
 
 		<ListView
@@ -41,6 +53,8 @@
 			  android:layout_height="wrap_content"
 			  android:layout_weight=".9"
 			  android:background="@color/Lavender"
+			  android:divider="@android:color/transparent"
+			  android:dividerHeight="20.0sp"
 			  />
 
 </LinearLayout>
