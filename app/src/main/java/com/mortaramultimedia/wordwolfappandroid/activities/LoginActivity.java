@@ -63,6 +63,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 	private ImageButton mCreateNewAccountView;		// create new account button
 	private ImageButton mSetUserToTest1View;		// set user to test1 button
 	private ImageButton mSetUserToTest2View;		// set user to test2 button
+	private ImageButton mSetUserToTest3View;		// set user to test3 button
+	private ImageButton mSetUserToTest4View;		// set user to test4 button
 	private View mProgressView;						// login progress bar/wheel
 
 	// statics
@@ -93,6 +95,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mCreateNewAccountView	= (ImageButton) 			findViewById(R.id.createNewAccountButton);
 		mSetUserToTest1View 	= (ImageButton) 			findViewById(R.id.setUserToTest1_button);
 		mSetUserToTest2View		= (ImageButton) 			findViewById(R.id.setUserToTest2_button);
+		mSetUserToTest3View 	= (ImageButton) 			findViewById(R.id.setUserToTest3_button);
+		mSetUserToTest4View		= (ImageButton) 			findViewById(R.id.setUserToTest4_button);
 		mProgressView 			= (View) 					findViewById(R.id.login_progress);
 
 		// set default values in text fields to expedite testing
@@ -146,6 +150,28 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 			{
 				Log.d(TAG, "mSetUserToTest2View clicked");
 				setFieldsToTestUserNum(2);
+			}
+		});
+
+		// assign test user 3 behavior
+		mSetUserToTest3View.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				Log.d(TAG, "mSetUserToTest3View clicked");
+				setFieldsToTestUserNum(3);
+			}
+		});
+
+		// assign test user 4 behavior
+		mSetUserToTest4View.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				Log.d(TAG, "mSetUserToTest4View clicked");
+				setFieldsToTestUserNum(4);
 			}
 		});
 
