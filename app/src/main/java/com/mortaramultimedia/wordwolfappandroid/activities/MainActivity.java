@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -44,6 +46,8 @@ public class MainActivity extends Activity {
 	{
 		Log.d(TAG, "init");
 
+		Log.w(TAG, "init: IP address: " + getIpAddr());
+
 		statusText 	= (TextView) 	findViewById(R.id.statusText);
 		startButton = (ImageButton) findViewById(R.id.startButton);
 
@@ -51,6 +55,22 @@ public class MainActivity extends Activity {
 //		setStartButtonVisibility(View.INVISIBLE);
 		populateDictionary();	//TODO - move to game or setup, if this seems to increase startup time
 
+	}
+
+	public String getIpAddr()
+	{
+		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+		int ip = wifiInfo.getIpAddress();
+
+		String ipString = String.format(
+				"%d.%d.%d.%d",
+				(ip & 0xff),
+				(ip >> 8 & 0xff),
+				(ip >> 16 & 0xff),
+				(ip >> 24 & 0xff));
+
+		return ipString;
 	}
 
 	private void setStartButtonVisibility( int v )

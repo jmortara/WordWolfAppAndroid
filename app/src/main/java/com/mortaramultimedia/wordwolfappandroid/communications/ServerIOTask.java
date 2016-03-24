@@ -15,6 +15,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 
@@ -64,6 +66,8 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 			Log.d(TAG, "Attempting to connect to " + host + " " + Model.PORT);
 			try
 			{
+				Log.d(TAG, "Socket timeout is:  " + s.getSoTimeout());
+				s.setKeepAlive(true);
 				s.connect(new InetSocketAddress(host, Model.PORT));
 			}
 			//Host not found
@@ -174,14 +178,25 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 					{
 						while ((responseObj = s_objIn.readObject()) != null)
 						{
-							Log.d(TAG, "Server response obj: " + responseObj);
+							Log.d(TAG, "RECEIVED Server response obj: " + responseObj);
 							//Model.setIncomingMessageObj(responseObj);
 							handleIncomingObject(responseObj);
 						}
 					}
+					catch (SocketException e3)
+					{
+						Log.e(TAG, "SocketException. Killing connections.");
+						Comm.kill();
+					}
+					catch (SocketTimeoutException e2)
+					{
+						Log.e(TAG, "SocketTimeoutException. Killing connections.");
+						Comm.kill();
+					}
 					catch(EOFException e)		// could be caused by server going down
 					{
-						e.printStackTrace();
+						Log.e(TAG, "EOFException. Killing connections.");
+						Comm.kill();
 					}
 					catch (IOException | ClassNotFoundException e1)
 					{
@@ -415,12 +430,12 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		publishObject(response);
 		if (response.getRequestAccepted())
 		{
-			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
-			Model.setOpponentUsername(response.getSourceUserName());
+			Log.d(TAG, "handleSelectOpponentResponse: REQUEST ACCEPTED! from: " + response.getSourceUsername());
+			Model.setOpponentUsername(response.getSourceUsername());
 		}
 		else
 		{
-			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+			Log.d(TAG, "handleSelectOpponentResponse: REQUEST REJECTED! from: " + response.getSourceUsername());
 		}
 	}
 
@@ -517,6 +532,38 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 	{
 		String str = "onPostExecute: " + result;
 		Log.d(TAG, str);
+	}
+
+	public void kill()
+	{
+		Log.d(TAG, "kill **********************");
+
+		try
+		{
+			s_objIn.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
+			s_objOut.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
+			s.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 }

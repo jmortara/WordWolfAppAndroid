@@ -71,6 +71,28 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 	}
 
 	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		Log.w(TAG, "onPause ************************");
+	}
+
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+		Log.w(TAG, "onStop ************************");
+		//Comm.kill();		// can't use, as this is being called when new Activity is launched
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		Log.e(TAG, "onDestroy ************************");
+	}
+
+	@Override
 	public void onBackPressed()
 	{
 		Log.d(TAG, "onBackPressed: Ignoring.");
@@ -119,7 +141,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 					Log.d(TAG, "Opponent List Item Click Listener: position clicked: " + position);
 					final PublicPlayerData opponentPlayerData = (PublicPlayerData) parent.getItemAtPosition(position);
 					Log.d(TAG, "Opponent List Item Click Listener: opponent list item clicked (position), opponentName: (" + position + ") " + opponentPlayerData.getUsername());
-					SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentPlayerData.getUsername());
+					SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), opponentPlayerData.getUsername(), false);
 					Comm.sendObject(request);
 				}
 			});
@@ -252,7 +274,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
 				Model.setOpponentUsername(sourceUsername);
-				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername);
+				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername, false, false);
 				Comm.sendObject(response);
 			}
 		});
@@ -264,7 +286,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
-				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername);
+				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername, false, false);
 				Comm.sendObject(response);
 			}
 		});
@@ -279,13 +301,13 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 //		publishObject(response);
 		if (response.getRequestAccepted())
 		{
-			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
-			Model.setOpponentUsername(response.getSourceUserName());
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUsername());
+			Model.setOpponentUsername(response.getSourceUsername());
 			launchGameSetupActivity();
 		}
 		else
 		{
-			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUsername());
 		}
 	}
 

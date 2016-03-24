@@ -49,6 +49,28 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
     }
 
     @Override
+    protected void onPause()
+    {
+        super.onPause();
+        Log.w(TAG, "onPause ************************");
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        Log.w(TAG, "onStop ************************");
+        //Comm.kill();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        Log.e(TAG, "onDestroy ************************");
+    }
+
+    @Override
     public void onBackPressed()
     {
         Log.d(TAG, "onBackPressed: Ignoring.");
@@ -95,7 +117,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
                 Log.d(TAG, "showGameOverDialog: dialog button pressed: positive");
 
                 // send out a post-endgame request specifying a rematch
-                //TODO - why not just use the existing GetOpponentRequest?
+                //TODO - why not just use the existing GetOpponentRequest? it now has an isRematch param...
                 final PostEndGameActionRequest rematchRequest = new PostEndGameActionRequest(1, Model.getUserLogin().getUserName(),
                         2, Model.getOpponentUsername(), "game_type_rematch", true, Model.getGameBoard().getRows(), Model.getGameBoard().getCols(),
                         Model.getGameDurationMS());
@@ -202,7 +224,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         }
         else if (obj instanceof SelectOpponentRequest)
         {
-            // show a Select Opponent Request dialog, similar to the one in ConnectionActivity
+            // show a Select Opponent Request dialog, similar to the one in ConnectionActivity (this is a rematch invite dialog)
             if (((SelectOpponentRequest) obj).getDestinationUserName().equals(Model.getUserLogin().getUserName()))
             {
                 showSelectOpponentRequestDialog((SelectOpponentRequest) obj);
@@ -244,7 +266,37 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
 //		publishObject(response);
         if (response.getRequestAccepted())
         {
-            Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
+            Log.d(TAG, "handleSelectOpponentResponse: (case A) REQUEST for rematch ACCEPTED! from: " + response.getSourceUsername());
+            GameManager.resetScore();
+            Model.setOpponentUsername(response.getSourceUsername());
+            dismissGameOverDialog();
+            switchToGameSetupActivity();
+        }
+        else
+        {
+            // if this client was the recipient of a rematch invitation and declined it, this response is a confirmation, so just go back to Choose Opponent Activity
+            if(!response.getSourceUsername().equals(Model.getUserLogin().getUserName()) && response.getShowDialog())
+            {
+                Log.d(TAG, "handleSelectOpponentResponse: (case B, inviter) REQUEST for rematch REJECTED! (or opponent offline) from: " + response.getSourceUsername());
+                showOpponentNotAvailableDialog(response.getSourceUsername());
+            }
+            // if this client is the one who initiated a rematch invitation, show a dialog stating that the current opponent is not available
+            else
+            {
+                Log.d(TAG, "handleSelectOpponentResponse: (case C, decliner) REQUEST for rematch REJECTED! (or opponent offline) from: " + response.getSourceUsername());
+                Model.setOpponentUsername(null);
+                switchToChooseOpponentActivity();
+            }
+        }
+    }
+
+    private void handlePostEndGameActionResponse(PostEndGameActionResponse response)
+    {
+        Log.d(TAG, "handlePostEndGameActionResponse: " + response);
+
+        if(response.getRequestAccepted())
+        {
+            Log.d(TAG, "handlePostEndGameActionResponse: REQUEST for rematch ACCEPTED! from: " + response.getSourceUserName());
             GameManager.resetScore();
             Model.setOpponentUsername(response.getSourceUserName());
             dismissGameOverDialog();
@@ -252,19 +304,16 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         }
         else
         {
-            Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! (or opponent offline) from: " + response.getSourceUserName());
-            showOpponentNotAvailableDialog(response);
-        }
-    }
-
-    private void handlePostEndGameActionResponse(PostEndGameActionResponse response)
-    {
-        Log.d(TAG, "handlePostEndGameActionResponse");
-
-        if(!response.getRequestAccepted())
-        {
-            Log.d(TAG, "handlePostEndGameActionResponse: request for rematch REJECTED!");
-            switchToChooseOpponentActivity();
+            Log.d(TAG, "handlePostEndGameActionResponse: REQUEST for rematch REJECTED! (or opponent offline) from: " + response.getSourceUserName());
+            if (response.getSourceUserName().equals(Model.getUserLogin().getUserName()))
+            {
+                showOpponentNotAvailableDialog(response.getSourceUserName());
+            }
+            else
+            {
+                Model.setOpponentUsername(null);
+                switchToChooseOpponentActivity();
+            }
         }
     }
 
@@ -292,22 +341,24 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
     {
         Log.d(TAG, "showSelectOpponentRequestDialog");
 
+        dismissGameOverDialog();
         dismissSelectOpponentRequestDialog();
 
-        final String sourceUsername = request.getSourceUsername();
         selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
         selectOpponentRequestDialog.setTitle("Opponent Request");
         selectOpponentRequestDialog.setMessage("You have been invited to have a rematch with: " + request.getSourceUsername());
         selectOpponentRequestDialog.setCancelable(false);
+
+        final String sourceUsername = Model.getUserLogin().getUserName();
+        final String destinationUsername = request.getSourceUsername();     // the source of the incoming request becomes the destination for this response
 
         // set up and listener for Accept button
         selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
-//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
-//				String sourceUsername = request.getSourceUsername();
-                SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername);
+                dismissGameOverDialog();
+                SelectOpponentResponse response = new SelectOpponentResponse(true, sourceUsername, destinationUsername, true, false);
                 Comm.sendObject(response);
             }
         });
@@ -317,9 +368,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
-//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
-//				String sourceUsername = request.getSourceUsername();
-                SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername);
+                SelectOpponentResponse response = new SelectOpponentResponse(false, sourceUsername, destinationUsername, true, false);
                 Comm.sendObject(response);
             }
         });
@@ -327,7 +376,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         selectOpponentRequestDialog.show();
     }
 
-    private void showOpponentNotAvailableDialog(SelectOpponentResponse response)
+    private void showOpponentNotAvailableDialog(String opponentUsername)
     {
         Log.d(TAG, "showOpponentNotAvailableDialog");
 
@@ -338,7 +387,7 @@ public class GameOverActivity extends Activity implements IExtendedAsyncTask
         opponentNotAvailableDialog = new AlertDialog.Builder(this).create();
         opponentNotAvailableDialog.setCancelable(false);
         opponentNotAvailableDialog.setTitle("This Opponent Is Not Available, " + Model.getUserLogin().getUserName() + "!");
-        opponentNotAvailableDialog.setMessage("Unfortunately, " + Model.getOpponentUsername() + " is not available for a rematch.\n\n" +
+        opponentNotAvailableDialog.setMessage("Unfortunately, " + opponentUsername + " is not available for a rematch.\n\n" +
                         "Try another opponent!"
         );
 

@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -20,6 +21,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -101,6 +103,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
 		// set default values in text fields to expedite testing
 		setDefaults();
+
+		hideSoftKeyboard();
 
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 
@@ -230,6 +234,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		mEmailView.setText(storedRequest.getEmail());
 	}
 
+	private void hideSoftKeyboard()
+	{
+		Log.d(TAG, "hideSoftKeyboard");
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mUsernameView.getWindowToken(), 0);
+	}
 
 	/********************************************************
 	 * Attempt the Login once the user fields are filled in

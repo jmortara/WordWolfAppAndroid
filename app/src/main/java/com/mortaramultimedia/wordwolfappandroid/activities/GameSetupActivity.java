@@ -29,7 +29,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	private TextView mUsernameText;
 	private TextView mOpponentUsernameText;
 	private ImageButton mPlayButton;
-
+	private Toast waitingToast;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -52,6 +52,29 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		super.onResume();
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
 		updateUI();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		Log.w(TAG, "onPause ************************");
+		dismissWaitingForOpponentToast();
+	}
+
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+		Log.w(TAG, "onStop ************************");
+		//Comm.kill();
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		Log.e(TAG, "onDestroy ************************");
 	}
 
 	@Override
@@ -125,12 +148,24 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Comm.sendObject(request);
 	}
 
-	private void showWaitingForOpponentToast() {
+	private void showWaitingForOpponentToast()
+	{
 		Log.d(TAG, "showWaitingForOpponentToast");
 
-		final Toast waitingToast = Toast.makeText(this, "Waiting for " + Model.getOpponentUsername() + " to start the game, one moment...", Toast.LENGTH_LONG);
+		waitingToast = Toast.makeText(this, "Waiting for " + Model.getOpponentUsername() + " to start the game, one moment...", Toast.LENGTH_LONG);
 		waitingToast.setGravity(Gravity.CENTER, 0, 0);
 		waitingToast.show();
+	}
+
+	private void dismissWaitingForOpponentToast()
+	{
+		Log.d(TAG, "dismissWaitingForOpponentToast");
+
+		if (waitingToast != null)
+		{
+			waitingToast.cancel();
+			waitingToast = null;
+		}
 	}
 
 	/////////////////////////////////////
@@ -180,6 +215,8 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 	private void launchBoardActivity()
 	{
 		Log.d(TAG, "launchBoardActivity from GameSetupActivity");
+
+		dismissWaitingForOpponentToast();
 
 		// create an Intent for launching the Board Activity, with optional additional params
 		Context thisContext = GameSetupActivity.this;

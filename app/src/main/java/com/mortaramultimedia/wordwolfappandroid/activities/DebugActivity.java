@@ -365,8 +365,8 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 	{
 		Log.d(TAG, "handleSelectOpponentButtonClick");
 		hideSoftKeyboard();
-		String msg = mInputText.getText().toString();
-		SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), msg);
+		String destinationUsername = mInputText.getText().toString();
+		SelectOpponentRequest request = new SelectOpponentRequest(Model.getUserLogin().getUserName(), destinationUsername, false);
 		serverIOTask.sendOutgoingObject(request);
 	}
 
@@ -393,7 +393,7 @@ public class DebugActivity extends Activity implements IExtendedAsyncTask
 			if (Model.getConnected() && Model.getLoggedIn() && Model.getUserLogin().getUserName() != null)
 			{
 				Log.d(TAG, "handleRequestToBecomeOpponent: accepting opponent request: " + Model.getSelectOpponentRequest());
-				response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), Model.getSelectOpponentRequest().getSourceUsername());
+				response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), Model.getSelectOpponentRequest().getSourceUsername(), false, false);
 				serverIOTask.sendOutgoingObject(response);
 			}
 		}

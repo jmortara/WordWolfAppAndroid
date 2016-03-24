@@ -418,7 +418,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
 				Model.setOpponentUsername(sourceUsername);
-				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername);
+				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername, false, false);
 				Comm.sendObject(response);
 			}
 		});
@@ -430,7 +430,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
 //				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
 //				String sourceUsername = request.getSourceUsername();
-				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername);
+				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername, false, false);
 				Comm.sendObject(response);
 			}
 		});
@@ -445,14 +445,14 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 //		publishObject(response);
 		if (response.getRequestAccepted())
 		{
-			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUserName());
-			Model.setOpponentUsername(response.getSourceUserName());
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST ACCEPTED! from: " + response.getSourceUsername());
+			Model.setOpponentUsername(response.getSourceUsername());
 			dismissSelectOpponentRequestDialog();
 			launchGameSetupActivity();
 		}
 		else
 		{
-			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUserName());
+			Log.d(TAG, "handleRequestToBecomeOpponent: REQUEST REJECTED! from: " + response.getSourceUsername());
 		}
 	}
 

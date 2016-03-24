@@ -122,11 +122,12 @@ public class Model
 
 	public static void setOpponentUsername(String opponentUsername)
 	{
-		if(opponentUsername == null)
+		/*if(opponentUsername == null)
 		{
 			throw new Error("WARNING********************* null opponentUserName");
-		}
+		}*/
 		Model.opponentUsername = opponentUsername;
+		Log.w(TAG, "setOpponentUsername: opponentUsername is now: " + Model.opponentUsername);
 	}
 
 	public static Object getIncomingObj()

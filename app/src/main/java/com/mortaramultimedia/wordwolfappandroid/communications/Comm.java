@@ -165,4 +165,29 @@ public class Comm
 			e.printStackTrace();
 		}
 	}
+
+	public static void kill()
+	{
+		Log.d(TAG, "kill **********************");
+
+		try
+		{
+			inStream.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
+			outStream.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		serverIOTask.kill();
+	}
 }
