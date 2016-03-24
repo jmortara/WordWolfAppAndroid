@@ -2,6 +2,7 @@ package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,6 +67,7 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		Log.d(TAG, "onResume");
 		super.onResume();
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+		Comm.handleAppSentToForeground(this);
 		updateUI();
 		requestPlayerList();
 	}
@@ -83,6 +85,31 @@ public class ChooseOpponentActivity extends Activity implements IExtendedAsyncTa
 		super.onStop();
 		Log.w(TAG, "onStop ************************");
 		//Comm.kill();		// can't use, as this is being called when new Activity is launched
+	}
+
+	@Override
+	protected void onUserLeaveHint()
+	{
+		super.onUserLeaveHint();
+		Log.w(TAG, "onUserLeaveHint ************************");
+	}
+
+	@Override
+	public void onTrimMemory(int i)
+	{
+		Log.w(TAG, "onTrimMemory ************************ " + i);
+		if(i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN || i == ComponentCallbacks2.TRIM_MEMORY_COMPLETE)	// 20 or 80
+		{
+			Log.d(TAG, "app went to background *******************");
+			Comm.handleAppSentToBackground(this);
+		}
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus)
+	{
+		super.onWindowFocusChanged(hasFocus);
+		Log.w(TAG, "onWindowFocusChanged ************************");
 	}
 
 	@Override

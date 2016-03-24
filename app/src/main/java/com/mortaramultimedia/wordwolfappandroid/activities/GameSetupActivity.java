@@ -1,6 +1,7 @@
 package com.mortaramultimedia.wordwolfappandroid.activities;
 
 import android.app.Activity;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,6 +52,7 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		Log.d(TAG, "onResume");
 		super.onResume();
 		Comm.registerCurrentActivity(this);	// tell Comm to forward published progress updates to this Activity
+		Comm.handleAppSentToForeground(this);
 		updateUI();
 	}
 
@@ -68,6 +70,17 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 		super.onStop();
 		Log.w(TAG, "onStop ************************");
 		//Comm.kill();
+	}
+
+	@Override
+	public void onTrimMemory(int i)
+	{
+		Log.w(TAG, "onTrimMemory ************************ " + i);
+		if(i == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN || i == ComponentCallbacks2.TRIM_MEMORY_COMPLETE)	// 20 or 80
+		{
+			Log.d(TAG, "app went to background *******************");
+			Comm.handleAppSentToBackground(this);
+		}
 	}
 
 	@Override

@@ -1,7 +1,10 @@
 package com.mortaramultimedia.wordwolfappandroid.communications;
 
+import android.app.Activity;
 import android.util.Log;
 
+import com.mortaramultimedia.wordwolf.shared.constants.AppStatus;
+import com.mortaramultimedia.wordwolf.shared.messages.AppStatusChangedRequest;
 import com.mortaramultimedia.wordwolf.shared.messages.ConnectToDatabaseRequest;
 import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
@@ -150,6 +153,40 @@ public class Comm
 			Log.d(TAG, "handleProgressUpdate: forwarding object to currentActivity: " + currentActivity.toString());
 			currentActivity.handleIncomingObject(obj);
 		}
+	}
+
+	public static void handleActivityPaused(Activity activity)
+	{
+		Log.d(TAG, "handleActivityPaused: " + activity);
+	}
+
+	public static void handleActivityStopped(Activity activity)
+	{
+		Log.d(TAG, "handleActivityStopped: " + activity);
+	}
+
+	/**
+	 * Inform the server that the client app has been sent to the background.
+	 * @param activity
+	 */
+	public static void handleAppSentToBackground(Activity activity)
+	{
+		Log.d(TAG, "handleAppSentToBackground: ******************* from Activity: " + activity);
+
+		AppStatusChangedRequest request = new AppStatusChangedRequest(AppStatus.BACKGROUND);
+		sendObject(request);
+	}
+
+	/**
+	 * Inform the server that the client app has been sent to the foreground.
+	 * @param activity
+	 */
+	public static void handleAppSentToForeground(Activity activity)
+	{
+		Log.d(TAG, "handleAppSentToForeground: ******************* from Activity: " + activity);
+
+		AppStatusChangedRequest request = new AppStatusChangedRequest(AppStatus.FOREGROUND);
+		sendObject(request);
 	}
 
 	public static void sendObject(Object obj)
