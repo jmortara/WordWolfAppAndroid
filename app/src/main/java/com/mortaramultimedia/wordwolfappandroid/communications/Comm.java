@@ -173,7 +173,7 @@ public class Comm
 	{
 		Log.d(TAG, "handleAppSentToBackground: ******************* from Activity: " + activity);
 
-		AppStatusChangedRequest request = new AppStatusChangedRequest(AppStatus.BACKGROUND);
+		AppStatusChangedRequest request = new AppStatusChangedRequest(Model.getUserLogin().getUserName(), AppStatus.BACKGROUND);
 		sendObject(request);
 	}
 
@@ -185,7 +185,7 @@ public class Comm
 	{
 		Log.d(TAG, "handleAppSentToForeground: ******************* from Activity: " + activity);
 
-		AppStatusChangedRequest request = new AppStatusChangedRequest(AppStatus.FOREGROUND);
+		AppStatusChangedRequest request = new AppStatusChangedRequest(Model.getUserLogin().getUserName(), AppStatus.FOREGROUND);
 		sendObject(request);
 	}
 
