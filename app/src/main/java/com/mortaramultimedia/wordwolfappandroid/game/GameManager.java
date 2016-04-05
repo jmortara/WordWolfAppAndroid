@@ -97,8 +97,13 @@ public class GameManager
 		Log.d( TAG, "isValidTileSelection: adjRow:  " + adjRow );
 
 
+		// if the tile has already been selected, it's invalid
+		if ( Model.getSelectedTiles().contains(td) )
+		{
+			return false;
+		}
 		// if same move as last, it's invalid
-		if ( sameCol && sameRow )
+		else if ( sameCol && sameRow )
 		{
 			return false;
 		}
@@ -109,11 +114,9 @@ public class GameManager
 		}
 		else
 		{
-			Log.d( TAG, "isValidTileSelection: UNHANDLED CASE" );
+			Log.w( TAG, "isValidTileSelection: UNHANDLED CASE" );
 			return false;
 		}
-		//TODO:insert case for using a button already selected
-		//return true;
 	}
 
 	public static String getWordSoFar()
