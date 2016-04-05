@@ -21,11 +21,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.mortaramultimedia.wordwolf.shared.messages.CreateNewAccountRequest;
 import com.mortaramultimedia.wordwolf.shared.messages.CreateNewAccountResponse;
@@ -51,23 +53,25 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 {
 	private static final String TAG = "LoginActivity";
 
+    private String mode = "login";
 	private LoginAsyncTask loginTask;
 	private CreateNewAccountAsyncTask createNewAccountTask;
 	private LoginRequest loginRequest = null;
 
 	// UI references.
+	private TextView mTitleText;					// title text
 	private View mLoginFormView;					// main form
-	private AutoCompleteTextView mUsernameView;		// username text field
-	private AutoCompleteTextView mEmailView;		// email text field
-	private EditText mPasswordView;					// password text field
+	private AutoCompleteTextView mUsernameText;		// username text field
+	private AutoCompleteTextView mEmailText;		// email text field
+	private EditText mPasswordText;					// password text field
 	private ImageButton mDoLoginButton;				// login button
 	private ImageButton mClearInputFieldsButton;	// clear input fields button
-	private ImageButton mCreateNewAccountView;		// create new account button
-	private ImageButton mSetUserToTest1View;		// set user to test1 button
-	private ImageButton mSetUserToTest2View;		// set user to test2 button
-	private ImageButton mSetUserToTest3View;		// set user to test3 button
-	private ImageButton mSetUserToTest4View;		// set user to test4 button
-	private View mProgressView;						// login progress bar/wheel
+	private ImageButton mCreateNewAccountButton;	// create new account button
+	private ImageButton mSetUserToTest1Button;		// set user to test1 button
+	private ImageButton mSetUserToTest2Button;		// set user to test2 button
+	private ImageButton mSetUserToTest3Button;		// set user to test3 button
+	private ImageButton mSetUserToTest4Button;		// set user to test4 button
+	private View mProgressWheel;					// login progress bar/wheel
 
 	// statics
 	public static final int RESULT_CREATE_NEW_ACCOUNT_OK 		= -2;
@@ -82,27 +86,59 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
-		// check for an Intent and any params it carries
+		// check for an Intent and the mode param it carries
 		Intent intent = getIntent();
-		String testValue = intent.getStringExtra("testParam");
-		Log.d(TAG, "onCreate found an intent testParam of: " + testValue);
+		String mode = intent.getStringExtra("mode");
+		Log.d(TAG, "onCreate found an intent mode of: " + mode);
+        this.mode = mode;
 
 		// assign UI references
+        mTitleText 			    = (TextView) 				findViewById(R.id.titleText);
 		mLoginFormView 			= (View) 					findViewById(R.id.login_form);
-		mUsernameView 			= (AutoCompleteTextView) 	findViewById(R.id.username);
-		mEmailView 				= (AutoCompleteTextView) 	findViewById(R.id.email);
-		mPasswordView 			= (EditText) 				findViewById(R.id.password);
+		mUsernameText           = (AutoCompleteTextView) 	findViewById(R.id.username);
+		mEmailText              = (AutoCompleteTextView) 	findViewById(R.id.email);
+		mPasswordText           = (EditText) 				findViewById(R.id.password);
 		mDoLoginButton 			= (ImageButton) 			findViewById(R.id.doLoginButton);
 		mClearInputFieldsButton = (ImageButton) 			findViewById(R.id.clearInputFieldsButton);
-		mCreateNewAccountView	= (ImageButton) 			findViewById(R.id.createNewAccountButton);
-		mSetUserToTest1View 	= (ImageButton) 			findViewById(R.id.setUserToTest1_button);
-		mSetUserToTest2View		= (ImageButton) 			findViewById(R.id.setUserToTest2_button);
-		mSetUserToTest3View 	= (ImageButton) 			findViewById(R.id.setUserToTest3_button);
-		mSetUserToTest4View		= (ImageButton) 			findViewById(R.id.setUserToTest4_button);
-		mProgressView 			= (View) 					findViewById(R.id.login_progress);
+		mCreateNewAccountButton = (ImageButton) 			findViewById(R.id.createNewAccountButton);
+		mSetUserToTest1Button   = (ImageButton) 			findViewById(R.id.setUserToTest1_button);
+		mSetUserToTest2Button   = (ImageButton) 			findViewById(R.id.setUserToTest2_button);
+		mSetUserToTest3Button   = (ImageButton) 			findViewById(R.id.setUserToTest3_button);
+		mSetUserToTest4Button   = (ImageButton) 			findViewById(R.id.setUserToTest4_button);
+		mProgressWheel          = (View) 					findViewById(R.id.login_progress);
 
 		// set default values in text fields to expedite testing
 		setDefaults();
+
+        if(this.mode.equals("login"))
+        {
+            mTitleText.setText("Log In");
+
+            // remove unused Create New Account button
+            ViewGroup layout = (ViewGroup) mCreateNewAccountButton.getParent();
+            if(layout != null)
+            {
+                layout.removeView(mCreateNewAccountButton);
+            }
+            //mCreateNewAccountButton.setVisibility(View.INVISIBLE);
+        }
+        else if(this.mode.equals("create_new_account"))
+        {
+            mTitleText.setText("Create New Account");
+
+            // remove unused Login buttons
+            ViewGroup layout = (ViewGroup) mDoLoginButton.getParent();
+            if(layout != null)
+            {
+                layout.removeView(mDoLoginButton);
+            }
+
+            //mDoLoginButton.setVisibility(View.INVISIBLE);
+            mSetUserToTest1Button.setVisibility(View.INVISIBLE);
+            mSetUserToTest2Button.setVisibility(View.INVISIBLE);
+            mSetUserToTest3Button.setVisibility(View.INVISIBLE);
+            mSetUserToTest4Button.setVisibility(View.INVISIBLE);
+        }
 
 		hideSoftKeyboard();
 
@@ -127,57 +163,49 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		});
 
 		// assign Log In behavior
-		mCreateNewAccountView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Log.w(TAG, "mCreateNewAccountView clicked: behavior TBD");
-				startCreateNewAccount();
-			}
-		});
+		mCreateNewAccountButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.w(TAG, "mCreateNewAccountButton clicked: behavior TBD");
+                startCreateNewAccount();
+            }
+        });
 
 		// assign test user 1 behavior
-		mSetUserToTest1View.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				Log.d(TAG, "mSetUserToTest1View clicked");
-				setFieldsToTestUserNum(1);
-			}
-		});
+		mSetUserToTest1Button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "mSetUserToTest1Button clicked");
+                setFieldsToTestUserNum(1);
+            }
+        });
 
 		// assign test user 2 behavior
-		mSetUserToTest2View.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				Log.d(TAG, "mSetUserToTest2View clicked");
-				setFieldsToTestUserNum(2);
-			}
-		});
+		mSetUserToTest2Button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "mSetUserToTest2Button clicked");
+                setFieldsToTestUserNum(2);
+            }
+        });
 
 		// assign test user 3 behavior
-		mSetUserToTest3View.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				Log.d(TAG, "mSetUserToTest3View clicked");
-				setFieldsToTestUserNum(3);
-			}
-		});
+		mSetUserToTest3Button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "mSetUserToTest3Button clicked");
+                setFieldsToTestUserNum(3);
+            }
+        });
 
 		// assign test user 4 behavior
-		mSetUserToTest4View.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				Log.d(TAG, "mSetUserToTest4View clicked");
-				setFieldsToTestUserNum(4);
-			}
-		});
+		mSetUserToTest4Button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "mSetUserToTest4Button clicked");
+                setFieldsToTestUserNum(4);
+            }
+        });
 
 	}
 
@@ -206,39 +234,39 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		else if(Build.BRAND.equalsIgnoreCase("generic"))
 		{
 			Log.d(TAG, "setDefaults: running in EMULATOR");
-			setFieldsToTestUserNum(2);
+			//setFieldsToTestUserNum(2);
 		}
 
 		// device
 		else
 		{
 			Log.d(TAG, "setDefaults: running on DEVICE");
-			setFieldsToTestUserNum(1);
+			//setFieldsToTestUserNum(1);
 		}
 	}
 
 	private void setFieldsToTestUserNum(int num)
 	{
 		Log.d(TAG, "setFieldsToTestUserNum: " + num);
-		mUsernameView.setText("test" + num);
-		mPasswordView.setText("test" + num + "pass");
-		mEmailView.setText("test" + num + "@wordwolfgame.com");
+		mUsernameText.setText("test" + num);
+		mPasswordText.setText("test" + num + "pass");
+		mEmailText.setText("test" + num + "@wordwolfgame.com");
 	}
 
 	private void setFieldsToNewCreatedAccountValues()
 	{
 		Log.d(TAG, "setFieldsToNewCreatedAccountValues");
 		CreateNewAccountRequest storedRequest = Model.getCreateNewAccountRequest();
-		mUsernameView.setText(storedRequest.getUserName());
-		mPasswordView.setText(storedRequest.getPassword());
-		mEmailView.setText(storedRequest.getEmail());
+		mUsernameText.setText(storedRequest.getUserName());
+		mPasswordText.setText(storedRequest.getPassword());
+		mEmailText.setText(storedRequest.getEmail());
 	}
 
 	private void hideSoftKeyboard()
 	{
 		Log.d(TAG, "hideSoftKeyboard");
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(mUsernameView.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(mUsernameText.getWindowToken(), 0);
 	}
 
 	/********************************************************
@@ -254,13 +282,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		}
 
 		// Reset errors.
-		mEmailView.setError(null);
-		mPasswordView.setError(null);
+		mEmailText.setError(null);
+		mPasswordText.setError(null);
 
 		// Store values as locals at the time of the login attempt.
-		String username 	= mUsernameView.getText().toString();
-		String email 		= mEmailView.getText().toString();
-		String password 	= mPasswordView.getText().toString();
+		String username 	= mUsernameText.getText().toString();
+		String email 		= mEmailText.getText().toString();
+		String password 	= mPasswordText.getText().toString();
 
 		boolean cancel = false;		// cancel?
 		View focusView = null;		// the focus shifts depending on user input
@@ -268,30 +296,30 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		// Check for a valid username, if the user entered one.
 		if (!TextUtils.isEmpty(username) && !isUsernameValid(username))
 		{
-			mPasswordView.setError(getString(R.string.error_invalid_username));
-			focusView = mUsernameView;
+			mPasswordText.setError(getString(R.string.error_invalid_username));
+			focusView = mUsernameText;
 			cancel = true;
 		}
 
 		// Check for a valid password, if the user entered one.
 		if (!TextUtils.isEmpty(password) && !isPasswordValid(password))
 		{
-			mPasswordView.setError(getString(R.string.error_invalid_password));
-			focusView = mPasswordView;
+			mPasswordText.setError(getString(R.string.error_invalid_password));
+			focusView = mPasswordText;
 			cancel = true;
 		}
 
 		// Check for a valid email address.
 		if (TextUtils.isEmpty(email))
 		{
-			mEmailView.setError(getString(R.string.error_field_required));
-			focusView = mEmailView;
+			mEmailText.setError(getString(R.string.error_field_required));
+			focusView = mEmailText;
 			cancel = true;
 		}
 		else if (!isEmailValid(email))
 		{
-			mEmailView.setError(getString(R.string.error_invalid_email));
-			focusView = mEmailView;
+			mEmailText.setError(getString(R.string.error_invalid_email));
+			focusView = mEmailText;
 			cancel = true;
 		}
 
@@ -372,14 +400,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 				}
 			});
 
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mProgressView.animate().setDuration(shortAnimTime).alpha(
+			mProgressWheel.setVisibility(show ? View.VISIBLE : View.GONE);
+			mProgressWheel.animate().setDuration(shortAnimTime).alpha(
 					show ? 1 : 0).setListener(new AnimatorListenerAdapter()
 			{
 				@Override
 				public void onAnimationEnd(Animator animation)
 				{
-					mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+					mProgressWheel.setVisibility(show ? View.VISIBLE : View.GONE);
 				}
 			});
 		}
@@ -387,7 +415,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		{
 			// The ViewPropertyAnimator APIs are not available, so simply show
 			// and hide the relevant UI components.
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+			mProgressWheel.setVisibility(show ? View.VISIBLE : View.GONE);
 			mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
 	}
@@ -442,7 +470,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		//Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
 		ArrayAdapter<String> adapter = new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-		mEmailView.setAdapter(adapter);
+		mEmailText.setAdapter(adapter);
 	}
 
 	private interface ProfileQuery
@@ -469,13 +497,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		}
 
 		// Reset errors.
-		mEmailView.setError(null);
-		mPasswordView.setError(null);
+		mEmailText.setError(null);
+		mPasswordText.setError(null);
 
 		// Store values as locals at the time of the create new account attempt.
-		String username 	= mUsernameView.getText().toString();
-		String email 		= mEmailView.getText().toString();
-		String password 	= mPasswordView.getText().toString();
+		String username 	= mUsernameText.getText().toString();
+		String email 		= mEmailText.getText().toString();
+		String password 	= mPasswordText.getText().toString();
 
 		boolean cancel = false;		// cancel?
 		View focusView = null;		// the focus shifts depending on user input
@@ -483,30 +511,30 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 		// Check for a valid username, if the user entered one.
 		if (!TextUtils.isEmpty(username) && !isUsernameValid(username))
 		{
-			mPasswordView.setError(getString(R.string.error_invalid_username));
-			focusView = mUsernameView;
+			mPasswordText.setError(getString(R.string.error_invalid_username));
+			focusView = mUsernameText;
 			cancel = true;
 		}
 
 		// Check for a valid password, if the user entered one.
 		if (!TextUtils.isEmpty(password) && !isPasswordValid(password))
 		{
-			mPasswordView.setError(getString(R.string.error_invalid_password));
-			focusView = mPasswordView;
+			mPasswordText.setError(getString(R.string.error_invalid_password));
+			focusView = mPasswordText;
 			cancel = true;
 		}
 
 		// Check for a valid email address.
 		if (TextUtils.isEmpty(email))
 		{
-			mEmailView.setError(getString(R.string.error_field_required));
-			focusView = mEmailView;
+			mEmailText.setError(getString(R.string.error_field_required));
+			focusView = mEmailText;
 			cancel = true;
 		}
 		else if (!isEmailValid(email))
 		{
-			mEmailView.setError(getString(R.string.error_invalid_email));
-			focusView = mEmailView;
+			mEmailText.setError(getString(R.string.error_invalid_email));
+			focusView = mEmailText;
 			cancel = true;
 		}
 
@@ -543,9 +571,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
 	private void clearInputFields()
 	{
-		mUsernameView.setText("");
-		mPasswordView.setText("");
-		mEmailView.setText("");
+		mUsernameText.setText("");
+		mPasswordText.setText("");
+		mEmailText.setText("");
 	}
 
 	@Override

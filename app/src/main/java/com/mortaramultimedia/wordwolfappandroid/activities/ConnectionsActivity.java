@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -68,6 +69,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		createUIReferences();
 		loginButton.setVisibility(View.INVISIBLE);
 		createNewAccountButton.setVisibility(View.INVISIBLE);
+		//createNewAccountButton.setVisibility(View.INVISIBLE);
 		chooseOpponentButton.setVisibility(View.INVISIBLE);
 		updateUI();
 
@@ -219,7 +221,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		// create an Intent for launching the Login Activity, with optional additional params
 		Context thisContext = ConnectionsActivity.this;
 		Intent intent = new Intent(thisContext, LoginActivity.class);
-		intent.putExtra("testParam", "testValue");                        //optional params
+		intent.putExtra("mode", "login");                        //optional params
 
 		// start the activity
 		startActivityForResult(intent, 1);      //TODO: note that in order for this class' onActivityResult to be called when the LoginActivity has completed, the requestCode here must be > 0
@@ -237,7 +239,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		// create an Intent for launching the Login Activity, with optional additional params
 		Context thisContext = ConnectionsActivity.this;
 		Intent intent = new Intent(thisContext, LoginActivity.class);
-		intent.putExtra("testParam", "testValue");                        //optional params
+		intent.putExtra("mode", "create_new_account");                        //optional params
 
 		// start the activity
 		startActivityForResult(intent, 1);      //TODO: note that in order for this class' onActivityResult to be called when the LoginActivity has completed, the requestCode here must be > 0
@@ -279,11 +281,18 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent)
 	{
-		if (resultCode == LoginActivity.RESULT_CREATE_NEW_ACCOUNT_OK)
+        ViewGroup layout = (ViewGroup) loginButton.getParent();
+
+        if (resultCode == LoginActivity.RESULT_CREATE_NEW_ACCOUNT_OK)
 		{
 			Log.d(TAG, "onActivityResult: Create New Account SUCCESS returned from LoginActivity. resultCode: " + resultCode);
-			createNewAccountButton.setVisibility(View.INVISIBLE);
-			showCreateNewAccountResultDialog();
+			//createNewAccountButton.setVisibility(View.INVISIBLE);
+            if(layout != null)
+            {
+                layout.removeView(createNewAccountButton);
+            }
+
+            showCreateNewAccountResultDialog();
 		}
 		else if (resultCode == LoginActivity.RESULT_CREATE_NEW_ACCOUNT_CANCELED)
 		{
@@ -293,7 +302,14 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 		else if (resultCode == RESULT_OK)   // see the note in the startActivityForResult above
 		{
 			Log.d(TAG, "onActivityResult: LOGIN SUCCESS returned from LoginActivity. resultCode: " + resultCode);
-		}
+            //loginButton.setVisibility(View.INVISIBLE);
+            //createNewAccountButton.setVisibility(View.INVISIBLE);
+            if(layout != null)
+            {
+                layout.removeView(loginButton);
+                layout.removeView(createNewAccountButton);
+            }
+        }
 		else if (resultCode == RESULT_CANCELED)
 		{
 			Log.d(TAG, "onActivityResult: LOGIN FAILURE returned from LoginActivity. resultCode: " + resultCode);
@@ -344,6 +360,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 			if (((ConnectToDatabaseResponse) obj).getSuccess())
 			{
 				loginButton.setVisibility(View.VISIBLE);
+				createNewAccountButton.setVisibility(View.VISIBLE);
 			}
 		}
 		else if (obj instanceof LoginResponse)

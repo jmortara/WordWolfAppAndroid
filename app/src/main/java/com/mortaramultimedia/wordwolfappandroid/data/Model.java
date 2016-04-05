@@ -26,7 +26,7 @@ public class Model
 	private static GameBoard gameBoard = null;
 	private static long gameDurationMS = 10000;
 
-	public static final String HOST = "wordwolfgame.com";	// WARNING - will connect to any site hosted on jasonmortara.com
+	public static final String HOST = "64.90.49.217";	//"wordwolfgame.com";	// WARNING - will connect to any site hosted on shared environment
 	public static final int PORT = 4001;
 
 	private static Boolean connected 			= false;
