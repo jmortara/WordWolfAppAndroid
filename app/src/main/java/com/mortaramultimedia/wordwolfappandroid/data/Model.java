@@ -26,8 +26,9 @@ public class Model
 	private static GameBoard gameBoard = null;
 	private static long gameDurationMS = 10000;
 
-	public static final String HOST = "64.90.49.217";	//"wordwolfgame.com";	// WARNING - will connect to any site hosted on shared environment
+	public static final String HOST = "45.55.212.44";           //"64.90.49.217";	//"wordwolfgame.com";	// WARNING - will connect to any site hosted on shared environment
 	public static final int PORT = 4001;
+	public static final int SOCKET_TIMEOUT_MS = 5000;
 
 	private static Boolean connected 			= false;
 	private static Boolean connectedToDatabase 	= false;
@@ -46,7 +47,7 @@ public class Model
 	// DEBUG SETTINGS
 	public static final Boolean DEV_DEBUG_MODE          = false;			// custom debug flag for developer use
 	public static final Boolean DEV_DEBUG_USE_LOCAL_IP  = false;			// custom debug flag: use local machine IP?
-	public static final String  DEV_DEBUG_LOCAL_IP_ADDR = "10.0.1.5";		// custom debug setting: local machine IP address (may change after reboots) // terminal: to lookup IP use: ipconfig getifaddr en0
+	public static final String  DEV_DEBUG_LOCAL_IP_ADDR = "10.0.1.4";		// custom debug setting: local machine IP address (may change after reboots) // terminal: to lookup IP use: ipconfig getifaddr en0
 
 
 	/**

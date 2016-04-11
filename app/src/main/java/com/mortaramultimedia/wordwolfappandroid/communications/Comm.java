@@ -72,7 +72,16 @@ public class Comm
 		}
 		else
 		{
-			Log.d(TAG, "connectToServer: not connected and serverIOTask is null.");
+			Log.d(TAG, "connectToServer: already connected or serverIOTask already exists.");
+            if(serverIOTask != null)
+            {
+                serverIOTask.kill();
+                serverIOTask.cancel(true);
+                serverIOTask = null;
+
+                serverIOTask = new ServerIOTask();
+                serverIOTask.execute();
+            }
 		}
 	}
 

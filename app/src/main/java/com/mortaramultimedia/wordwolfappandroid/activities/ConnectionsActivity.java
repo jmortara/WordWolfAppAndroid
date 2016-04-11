@@ -24,6 +24,9 @@ import com.mortaramultimedia.wordwolfappandroid.data.Model;
 import com.mortaramultimedia.wordwolfappandroid.interfaces.IExtendedAsyncTask;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 
 public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
@@ -58,6 +61,7 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 	// dialogs
 	private AlertDialog selectOpponentRequestDialog  = null;
 	private AlertDialog createNewAccountResultDialog = null;
+	private AlertDialog connectionFailureDialog = null;
 
 
 	@Override
@@ -397,6 +401,21 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 			dismissSelectOpponentRequestDialog();
 			launchBoardActivity();
 		}
+        // not coming from the server, this would come from Comm in the case an initial connection fails (e.g. unknown host)
+        else if(obj instanceof UnknownHostException)
+        {
+            showConnectionFailureDialog();
+        }
+        // not coming from the server, this would come from Comm in the case an initial connection fails (e.g. timeout)
+        else if(obj instanceof ConnectException)
+        {
+            showConnectionFailureDialog();
+        }
+        // not coming from the server, this would come from Comm in the case an initial connection fails (e.g. timeout)
+        else if(obj instanceof SocketTimeoutException)
+        {
+            showConnectionFailureDialog();
+        }
 		else
 		{
 			Log.d(TAG, "handleIncomingObject: object ignored.");
@@ -425,51 +444,84 @@ public class ConnectionsActivity extends Activity implements IExtendedAsyncTask
 
 		// set up and listener for Accept button
 		createNewAccountResultDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			}
-		});
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
 
 		createNewAccountResultDialog.show();
 	}
 
-	private void showSelectOpponentRequestDialog(SelectOpponentRequest request)
+	private void showConnectionFailureDialog()
 	{
-		Log.d(TAG, "showSelectOpponentRequestDialog");
+		Log.d(TAG, "showConnectionFailureDialog");
 
-		final String sourceUsername = request.getSourceUsername();
-		selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
-		selectOpponentRequestDialog.setTitle("Opponent Request");
-		selectOpponentRequestDialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
-		selectOpponentRequestDialog.setCancelable(false);
+		connectionFailureDialog = new AlertDialog.Builder(this).create();
+        connectionFailureDialog.setTitle("Can't Connect to Server");
+        connectionFailureDialog.setMessage("WordWolf can't connect to the server.");
+        connectionFailureDialog.setCancelable(false);
 
 		// set up and listener for Accept button
-		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
-//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
-//				String sourceUsername = request.getSourceUsername();
-				Model.setOpponentUsername(sourceUsername);
-				SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername, false, false);
-				Comm.sendObject(response);
-			}
-		});
+        connectionFailureDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Back to Start", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                ConnectionsActivity.this.finish();
+            }
+        });
 
 		// set up and listener for Decline button
-		selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener() {
+        connectionFailureDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Reconnect", new DialogInterface.OnClickListener()
+        {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
-//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
-//				String sourceUsername = request.getSourceUsername();
-				SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername, false, false);
-				Comm.sendObject(response);
+			public void onClick(DialogInterface dialog, int which)
+            {
+                Comm.connectToServer();
 			}
 		});
 
-		selectOpponentRequestDialog.show();
+        connectionFailureDialog.show();
 	}
+
+    private void showSelectOpponentRequestDialog(SelectOpponentRequest request)
+    {
+        Log.d(TAG, "showSelectOpponentRequestDialog");
+
+        final String sourceUsername = request.getSourceUsername();
+        selectOpponentRequestDialog = new AlertDialog.Builder(this).create();
+        selectOpponentRequestDialog.setTitle("Opponent Request");
+        selectOpponentRequestDialog.setMessage("You have been invited to start a new game with: " + request.getSourceUsername());
+        selectOpponentRequestDialog.setCancelable(false);
+
+        // set up and listener for Accept button
+        selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Accept!", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
+//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
+//				String sourceUsername = request.getSourceUsername();
+                Model.setOpponentUsername(sourceUsername);
+                SelectOpponentResponse response = new SelectOpponentResponse(true, Model.getUserLogin().getUserName(), sourceUsername, false, false);
+                Comm.sendObject(response);
+            }
+        });
+
+        // set up and listener for Decline button
+        selectOpponentRequestDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Decline", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // we can't get the request source player's username as an arg, so we have to retrieve it from the stored incomingObj
+//				SelectOpponentRequest request = (SelectOpponentRequest) Model.getIncomingObj();
+//				String sourceUsername = request.getSourceUsername();
+                SelectOpponentResponse response = new SelectOpponentResponse(false, Model.getUserLogin().getUserName(), sourceUsername, false, false);
+                Comm.sendObject(response);
+            }
+        });
+
+        selectOpponentRequestDialog.show();
+    }
+
 
 	private void handleSelectOpponentResponse(SelectOpponentResponse response)
 	{

@@ -61,19 +61,22 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		String host = Model.getHostIP();
 		s = new Socket();
 
+        Object exception = null;
+
 		try
 		{
 			Log.d(TAG, "Attempting to connect to " + host + " " + Model.PORT);
 			try
 			{
-				Log.d(TAG, "Socket timeout is:  " + s.getSoTimeout());
+                Log.d(TAG, "Socket timeout is: " + Model.SOCKET_TIMEOUT_MS);
 				s.setKeepAlive(true);
-				s.connect(new InetSocketAddress(host, Model.PORT));
+				s.connect(new InetSocketAddress(host, Model.PORT), Model.SOCKET_TIMEOUT_MS);
 			}
 			//Host not found
 			catch (UnknownHostException e)
 			{
 				System.err.println("Don't know about host : " + host);
+                exception = e;
 //					System.exit(1);	// exit app
 				try
 				{
@@ -117,7 +120,12 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 				{
 					Log.e(TAG, "Can't connect to IP. Check that actual IP is same as one defined in Model. Model.DEV_DEBUG_LOCAL_IP_ADDR is " + Model.DEV_DEBUG_LOCAL_IP_ADDR);
 				}
+                handleConnectException(e);
 			}
+            catch(SocketTimeoutException e)
+            {
+                handleSocketTimeoutException(e);
+            }
 			catch (SecurityException e)
 			{
 				Log.d(TAG, "SecurityException: " + e.getMessage());
@@ -191,6 +199,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 					catch (SocketTimeoutException e2)
 					{
 						Log.e(TAG, "SocketTimeoutException. Killing connections.");
+                        exception = e2;
 						Comm.kill();
 					}
 					catch(EOFException e)		// could be caused by server going down
@@ -208,6 +217,7 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 			else
 			{
 				Log.d(TAG, "Not connected.");
+                handleIncomingObject(exception);
 			}
 
 		}
@@ -346,6 +356,27 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		else if (obj instanceof PostEndGameActionResponse)
 		{
 			handlePostEndGameActionResponse(((PostEndGameActionResponse) obj));
+		}
+		/**
+		 * If UnknownHostException is passed, a connection failure has occurred due to an unknown host
+		 */
+		else if (obj instanceof UnknownHostException)
+		{
+			handleUnknownHostException(((UnknownHostException) obj));
+		}
+		/**
+		 * If ConnectException is passed, a connection failure has occurred, likely due to a socket timeout
+		 */
+		else if (obj instanceof ConnectException)
+		{
+			handleConnectException(((ConnectException) obj));
+		}
+		/**
+		 * If SocketTimeoutException is passed, a connection failure has occurred, likely due to a socket timeout
+		 */
+		else if (obj instanceof SocketTimeoutException)
+		{
+			handleSocketTimeoutException(((SocketTimeoutException) obj));
 		}
 		else
 		{
@@ -491,6 +522,24 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		publishObject(response);
 	}
 
+	private void handleUnknownHostException(UnknownHostException error)
+	{
+		Log.d(TAG, "handleUnknownHostException");
+		publishObject(error);
+	}
+
+	private void handleConnectException(ConnectException error)
+	{
+		Log.d(TAG, "handleConnectException");
+		publishObject(error);
+	}
+
+	private void handleSocketTimeoutException(SocketTimeoutException error)
+	{
+		Log.d(TAG, "handleSocketTimeoutException");
+		publishObject(error);
+	}
+
 	private void logGameBoard(GameBoard gameBoard)
 	{
 		Log.d(TAG, "logGameBoard: ");
@@ -540,7 +589,10 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 
 		try
 		{
-			s_objIn.close();
+            if(s_objIn != null)
+            {
+                s_objIn.close();
+            }
 		}
 		catch (IOException e)
 		{
@@ -548,19 +600,25 @@ public class ServerIOTask extends AsyncTask<Void, Integer, Integer>
 		}
 
 		try
-		{
-			s_objOut.close();
-		}
-		catch(IOException e)
+        {
+        if (s_objOut != null)
+        {
+            s_objOut.close();
+        }
+        }
+        catch(IOException e)
 		{
 			e.printStackTrace();
 		}
 
 		try
-		{
-			s.close();
-		}
-		catch(IOException e)
+        {
+            if (s != null)
+            {
+                s.close();
+            }
+        }
+        catch(IOException e)
 		{
 			e.printStackTrace();
 		}

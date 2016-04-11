@@ -163,11 +163,14 @@ public class GameSetupActivity extends Activity implements IExtendedAsyncTask
 
 	private void showWaitingForOpponentToast()
 	{
-		Log.d(TAG, "showWaitingForOpponentToast");
+        if (waitingToast == null)
+        {
+            Log.d(TAG, "showWaitingForOpponentToast");
 
-		waitingToast = Toast.makeText(this, "Waiting for " + Model.getOpponentUsername() + " to start the game, one moment...", Toast.LENGTH_LONG);
-		waitingToast.setGravity(Gravity.CENTER, 0, 0);
-		waitingToast.show();
+            waitingToast = Toast.makeText(this, "Waiting for " + Model.getOpponentUsername() + " to start the game, one moment...", Toast.LENGTH_LONG);
+            waitingToast.setGravity(Gravity.CENTER, 0, 0);
+            waitingToast.show();
+        }
 	}
 
 	private void dismissWaitingForOpponentToast()
