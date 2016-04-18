@@ -17,4 +17,6 @@ During the match, which lasts for a finite duration via a timer on the client, e
 
 When time runs out, each player's scores are verified and sent to the opponent so that each player knows who scored what and who won or lost. A rematch is offered, which may be accepted or declined. Also, fun is had.
 
+All code is currently in active development and performs extensive logging, which would be turned off in production.
+
 -Jason Mortara, 2016
